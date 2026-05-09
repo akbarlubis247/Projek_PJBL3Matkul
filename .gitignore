@@ -1,0 +1,27 @@
+# Nested git metadata backups
+**/.git_backup/
+
+# Laravel web secrets and generated dependencies
+kampus-lapor-web/.env
+kampus-lapor-web/.env.*
+kampus-lapor-web/vendor/
+kampus-lapor-web/node_modules/
+kampus-lapor-web/public/build/
+kampus-lapor-web/public/hot
+kampus-lapor-web/public/storage
+kampus-lapor-web/storage/*.key
+kampus-lapor-web/storage/logs/*.log
+kampus-lapor-web/.phpunit.result.cache
+kampus-lapor-web/.phpunit.cache/
+
+# Flutter generated files
+kampus_lapor_mobile/.dart_tool/
+kampus_lapor_mobile/build/
+kampus_lapor_mobile/android/build/
+kampus_lapor_mobile/.flutter-plugins-dependencies
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
