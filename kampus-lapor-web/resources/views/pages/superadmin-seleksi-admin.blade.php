@@ -1,0 +1,139 @@
+@extends('layouts.app')
+@php $title = 'Superadmin - Seleksi Admin'; @endphp
+
+@section('content')
+<div class="page-top">
+  <div>
+    <h2>Seleksi Daftar Admin</h2>
+    <p class="page-desc">Superadmin meninjau pengajuan admin unit sebelum akses pengelolaan laporan diberikan.</p>
+  </div>
+</div>
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-top"><span class="stat-label">Menunggu Review</span><span class="stat-icon" style="background:#fef3c7;color:#d97706;">{{ $summary['menunggu'] }}</span></div>
+    <div class="stat-sub">Pengajuan perlu keputusan</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-top"><span class="stat-label">Disetujui</span><span class="stat-icon" style="background:#ede9fe;color:#7c3aed;">{{ $summary['disetujui'] }}</span></div>
+    <div class="stat-sub">Admin aktif untuk unit kampus</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-top"><span class="stat-label">Ditolak</span><span class="stat-icon" style="background:#fee2e2;color:#ef4444;">{{ $summary['ditolak'] }}</span></div>
+    <div class="stat-sub">Pengajuan perlu perbaikan data</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-top"><span class="stat-label">Database</span><span class="stat-icon" style="background:#dbeafe;color:#3b82f6;">MongoDB</span></div>
+    <div class="stat-sub">kampus_lapor lokal</div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+    <div>
+      <h3>Daftar Calon Admin</h3>
+      <p>Validasi unit, email kampus, dan kebutuhan akses.</p>
+    </div>
+    <div class="search-input-wrap" style="width:280px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="searchAdmin" placeholder="Cari calon admin..." oninput="filterTable('searchAdmin','tableAdmin')" />
+    </div>
+  </div>
+  <div class="card-body" style="padding:0 0 1.5rem;">
+    <div class="table-wrap" style="border-left:none;border-right:none;border-radius:0;">
+      <table id="tableAdmin">
+        <thead>
+          <tr><th>Nama</th><th>NIDN/NIP</th><th>Kampus</th><th>Unit</th><th>Email</th><th>Alasan</th><th>Status</th><th style="text-align:right;">Aksi</th></tr>
+        </thead>
+        <tbody>
+          @foreach($candidates as $candidate)
+          <tr>
+            <td style="font-weight:600;">{{ $candidate['nama'] }}</td>
+            <td>{{ $candidate['nidn'] }}</td>
+            <td>{{ $candidate['kampus'] ?? '-' }}</td>
+            <td>{{ $candidate['unit'] }}</td>
+            <td style="color:#64748b;">{{ $candidate['email'] }}</td>
+            <td style="max-width:280px;">{{ $candidate['alasan'] }}</td>
+            <td><span class="badge badge-{{ strtolower($candidate['status']) }}">{{ $candidate['status'] }}</span></td>
+            <td style="text-align:right;white-space:nowrap;">
+              <form method="POST" action="{{ route('superadmin.seleksi-admin.ubah-status', $candidate['id']) }}" style="display:inline;">
+                @csrf @method('PATCH')
+                <input type="hidden" name="status" value="Disetujui">
+                <button class="btn-icon-sm btn-icon-green" title="Setujui admin" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
+              </form>
+              <form method="POST" action="{{ route('superadmin.seleksi-admin.ubah-status', $candidate['id']) }}" style="display:inline;">
+                @csrf @method('PATCH')
+                <input type="hidden" name="status" value="Ditolak">
+                <button class="btn-icon-sm btn-icon-red" title="Tolak pengajuan" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+              </form>
+            </td>
+          </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:1.5rem;">
+  <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">
+    <div>
+      <h3>Admin Aktif</h3>
+      <p>Daftar akun admin yang sudah disetujui dan bisa login mengelola kampus masing-masing.</p>
+    </div>
+    <div class="search-input-wrap" style="width:280px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" id="searchActiveAdmin" placeholder="Cari admin aktif..." oninput="filterTable('searchActiveAdmin','tableActiveAdmin')" />
+    </div>
+  </div>
+  <div class="card-body" style="padding:0 0 1.5rem;">
+    <div class="table-wrap" style="border-left:none;border-right:none;border-radius:0;">
+      <table id="tableActiveAdmin">
+        <thead>
+          <tr><th>Nama</th><th>Username</th><th>NIDN/NIP</th><th>Kampus</th><th>Unit</th><th>Email</th><th>No HP</th><th>Status</th><th>Dibuat</th></tr>
+        </thead>
+        <tbody>
+          @forelse($activeAdmins as $admin)
+          <tr>
+            <td style="font-weight:600;">{{ $admin['nama'] }}</td>
+            <td>{{ $admin['username'] }}</td>
+            <td>{{ $admin['nidn'] }}</td>
+            <td>
+              <strong>{{ $admin['kampus'] }}</strong>
+              @if($admin['kode_kampus'] !== '-')
+                <span class="table-muted">{{ $admin['kode_kampus'] }}</span>
+              @endif
+            </td>
+            <td>{{ $admin['unit'] }}</td>
+            <td style="color:#64748b;">{{ $admin['email'] }}</td>
+            <td>{{ $admin['phone'] }}</td>
+            <td><span class="badge badge-aktif">{{ ucfirst($admin['status']) }}</span></td>
+            <td style="color:#64748b;">{{ is_string($admin['created_at']) ? substr($admin['created_at'], 0, 10) : '-' }}</td>
+          </tr>
+          @empty
+          <tr>
+            <td colspan="9" style="text-align:center;color:#64748b;padding:1.5rem;">Belum ada admin aktif dari pendaftaran kampus.</td>
+          </tr>
+          @endforelse
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+function filterTable(inputId, tableId) {
+  const q = document.getElementById(inputId).value.toLowerCase();
+  document.getElementById(tableId).querySelectorAll('tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+</script>
+@endpush
+
