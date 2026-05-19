@@ -223,6 +223,65 @@ textarea { resize: vertical; min-height: 120px; }
 .field-error { margin-top: .35rem; color: #991b1b; font-size: .75rem; }
 .field-help { color: var(--muted); font-size: .78rem; margin-top: .35rem; }
 
+.campus-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.campus-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: .85rem;
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.campus-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.campus-logo-box {
+  width: 46px;
+  height: 46px;
+  border-radius: .75rem;
+  background: var(--green-50);
+  color: var(--green-700);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+}
+.campus-card h3 { font-size: 1rem; margin-bottom: .25rem; }
+.campus-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin: 1rem 0;
+}
+.campus-metrics div {
+  background: #f8fafc;
+  border-radius: .65rem;
+  padding: .75rem;
+}
+.campus-metrics span,
+.campus-admin span,
+.campus-admin small {
+  display: block;
+  color: var(--muted);
+  font-size: .75rem;
+}
+.campus-metrics strong {
+  display: block;
+  color: var(--green-700);
+  font-size: 1.2rem;
+  margin-top: .25rem;
+}
+.campus-admin {
+  border-top: 1px solid var(--border);
+  padding-top: .85rem;
+}
+
 /* Alert */
 .alert { padding: .75rem 1rem; border-radius: .5rem; font-size: .875rem; margin-bottom: 1rem; }
 .alert-success { background: var(--green-50); color: var(--green-800); border: 1px solid #c4b5fd; }

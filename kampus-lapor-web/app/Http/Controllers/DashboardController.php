@@ -516,6 +516,54 @@ class DashboardController extends Controller
 
     public function seleksiAdmin(AdminApplicationStore $applications)
     {
+        $candidates = $this->superadminCandidates($applications);
+        $summary = [
+            'menunggu' => $candidates->where('status', 'Menunggu')->count(),
+            'disetujui' => $candidates->where('status', 'Disetujui')->count(),
+            'ditolak' => $candidates->where('status', 'Ditolak')->count(),
+        ];
+
+        return view('pages.superadmin-seleksi-admin', compact('candidates', 'summary'));
+    }
+
+    public function adminAktif(AdminApplicationStore $applications)
+    {
+        $activeAdmins = $this->superadminActiveAdmins($applications);
+        $summary = [
+            'total' => $activeAdmins->count(),
+            'kampus' => $activeAdmins->pluck('kampus')->unique()->count(),
+            'aktif' => $activeAdmins->where('status', 'aktif')->count(),
+        ];
+
+        return view('pages.superadmin-admin-aktif', compact('activeAdmins', 'summary'));
+    }
+
+    public function dataKampus(AdminApplicationStore $applications)
+    {
+        $activeAdmins = $this->superadminActiveAdmins($applications);
+        $campuses = $activeAdmins
+            ->groupBy('kampus')
+            ->map(function ($admins, $kampus) {
+                $first = $admins->first();
+
+                return [
+                    'kampus' => $kampus,
+                    'kode_kampus' => $first['kode_kampus'] ?? '-',
+                    'admin_count' => $admins->count(),
+                    'admin_name' => $first['nama'] ?? '-',
+                    'email' => $first['email'] ?? '-',
+                    'phone' => $first['phone'] ?? '-',
+                    'laporan_masuk' => max(12, $admins->count() * 27),
+                    'status' => 'Aktif',
+                ];
+            })
+            ->values();
+
+        return view('pages.superadmin-data-kampus', compact('campuses'));
+    }
+
+    private function superadminCandidates(AdminApplicationStore $applications)
+    {
         $d = $this->dummyData();
         $registeredCandidates = collect($applications->all())->map(fn ($item) => [
             'id' => $item['id'],
@@ -530,13 +578,13 @@ class DashboardController extends Controller
             'surat_tugas_nama' => $item['surat_tugas_nama'] ?? null,
             'surat_tugas_path' => $item['surat_tugas_path'] ?? null,
         ]);
-        $candidates = $registeredCandidates->concat($d['adminCandidates']);
-        $summary = [
-            'menunggu' => $candidates->where('status', 'Menunggu')->count(),
-            'disetujui' => $candidates->where('status', 'Disetujui')->count(),
-            'ditolak' => $candidates->where('status', 'Ditolak')->count(),
-        ];
-        $activeAdmins = collect($applications->approvedAdmins())->map(fn ($item) => [
+
+        return $registeredCandidates->concat($d['adminCandidates']);
+    }
+
+    private function superadminActiveAdmins(AdminApplicationStore $applications)
+    {
+        return collect($applications->approvedAdmins())->map(fn ($item) => [
             'id' => $item['id'],
             'nama' => $item['name'] ?? $item['nama'] ?? '-',
             'username' => $item['username'] ?? '-',
@@ -549,8 +597,6 @@ class DashboardController extends Controller
             'status' => $item['status'] ?? '-',
             'created_at' => $item['created_at'] ?? '-',
         ]);
-
-        return view('pages.superadmin-seleksi-admin', compact('candidates', 'summary', 'activeAdmins'));
     }
 
     public function lihatDokumenAdmin($id, AdminApplicationStore $applications)
