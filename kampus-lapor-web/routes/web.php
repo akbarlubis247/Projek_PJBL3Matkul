@@ -37,5 +37,6 @@ Route::middleware(['role:admin'])->group(function () {
 
 Route::middleware(['role:superadmin'])->group(function () {
     Route::get('/superadmin/seleksi-admin', [DashboardController::class, 'seleksiAdmin'])->name('superadmin.seleksi-admin');
+    Route::get('/superadmin/seleksi-admin/{id}/dokumen', [DashboardController::class, 'lihatDokumenAdmin'])->name('superadmin.seleksi-admin.dokumen');
     Route::patch('/superadmin/seleksi-admin/{id}', [DashboardController::class, 'ubahStatusAdmin'])->name('superadmin.seleksi-admin.ubah-status');
 });

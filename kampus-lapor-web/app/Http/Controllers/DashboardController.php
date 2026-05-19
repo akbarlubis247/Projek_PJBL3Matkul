@@ -8,6 +8,7 @@ use App\Services\CampusDataStore;
 use App\Services\CampusReportStore;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
 
 class DashboardController extends Controller
@@ -526,6 +527,8 @@ class DashboardController extends Controller
             'role' => $item['role'] ?? 'Calon Admin',
             'status' => $item['status'] ?? 'Menunggu',
             'alasan' => $item['alasan'] ?? '-',
+            'surat_tugas_nama' => $item['surat_tugas_nama'] ?? null,
+            'surat_tugas_path' => $item['surat_tugas_path'] ?? null,
         ]);
         $candidates = $registeredCandidates->concat($d['adminCandidates']);
         $summary = [
@@ -548,6 +551,20 @@ class DashboardController extends Controller
         ]);
 
         return view('pages.superadmin-seleksi-admin', compact('candidates', 'summary', 'activeAdmins'));
+    }
+
+    public function lihatDokumenAdmin($id, AdminApplicationStore $applications)
+    {
+        $document = $applications->document((string) $id);
+
+        if (! $document || ! Storage::exists($document['path'])) {
+            abort(404, 'Dokumen surat tugas tidak ditemukan.');
+        }
+
+        return response()->file(Storage::path($document['path']), [
+            'Content-Type' => $document['mime'],
+            'Content-Disposition' => 'inline; filename="'.$document['name'].'"',
+        ]);
     }
 
     public function ubahStatusAdmin(Request $r, $id, AdminApplicationStore $applications)

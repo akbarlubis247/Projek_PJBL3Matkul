@@ -12,10 +12,11 @@
   <main class="login-shell">
     <section class="login-panel">
       <div class="login-brand">
-        <img class="login-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Kampus Lapor">
+        <div class="login-brand-logo-wrap">
+          <img class="login-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Kampus Lapor">
+        </div>
         <div>
-          <h1>Kampus Lapor</h1>
-          <p>Portal admin dan superadmin</p>
+          <h3>Sistem Pelaporan menuju Kampus Modern</h3>
         </div>
       </div>
 
@@ -28,21 +29,6 @@
 
       <form method="POST" action="{{ route('login.authenticate') }}" class="login-form">
         @csrf
-        <div class="form-group">
-          <label>Pilih Akses</label>
-          <div class="role-picker">
-            <label class="role-option">
-              <input type="radio" name="role" value="admin" {{ old('role', 'admin') === 'admin' ? 'checked' : '' }}>
-              <span>Admin</span>
-            </label>
-            <label class="role-option">
-              <input type="radio" name="role" value="superadmin" {{ old('role') === 'superadmin' ? 'checked' : '' }}>
-              <span>Superadmin</span>
-            </label>
-          </div>
-          @error('role') <p class="field-error">{{ $message }}</p> @enderror
-        </div>
-
         <div class="form-group">
           <label for="username">Username</label>
           <input id="username" name="username" type="text" value="{{ old('username', 'admin1') }}" autocomplete="username" autofocus>

@@ -38,21 +38,6 @@
   </div>
 </div>
 
-<div class="card" style="margin-bottom:1.25rem;">
-  <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
-    <div>
-      <h3>Export Laporan</h3>
-      <p>Unduh laporan yang sudah dikonfirmasi admin dalam format PDF atau Excel.</p>
-    </div>
-    <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
-      <a class="btn btn-pdf" href="{{ route('barang-hilang.export', ['format' => 'pdf']) }}">PDF Barang Hilang</a>
-      <a class="btn btn-excel" href="{{ route('barang-hilang.export', ['format' => 'excel']) }}">Excel Barang Hilang</a>
-      <a class="btn btn-pdf" href="{{ route('fasilitas-rusak.export', ['format' => 'pdf']) }}">PDF Fasilitas</a>
-      <a class="btn btn-excel" href="{{ route('fasilitas-rusak.export', ['format' => 'excel']) }}">Excel Fasilitas</a>
-    </div>
-  </div>
-</div>
-
 <div class="dashboard-grid">
   <div class="card">
     <div class="card-header"><h3>Tren Laporan</h3><p>Statistik 6 bulan terakhir</p></div>

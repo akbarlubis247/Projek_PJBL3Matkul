@@ -43,7 +43,7 @@
     <div class="table-wrap" style="border-left:none;border-right:none;border-radius:0;">
       <table id="tableAdmin">
         <thead>
-          <tr><th>Nama</th><th>NIDN/NIP</th><th>Kampus</th><th>Unit</th><th>Email</th><th>Alasan</th><th>Status</th><th style="text-align:right;">Aksi</th></tr>
+          <tr><th>Nama</th><th>NIDN/NIP</th><th>Kampus</th><th>Unit</th><th>Email</th><th>Alasan</th><th>Dokumen</th><th>Status</th><th style="text-align:right;">Aksi</th></tr>
         </thead>
         <tbody>
           @foreach($candidates as $candidate)
@@ -54,6 +54,16 @@
             <td>{{ $candidate['unit'] }}</td>
             <td style="color:#64748b;">{{ $candidate['email'] }}</td>
             <td style="max-width:280px;">{{ $candidate['alasan'] }}</td>
+            <td>
+              @if(!empty($candidate['surat_tugas_path']))
+                <a class="btn btn-outline" href="{{ route('superadmin.seleksi-admin.dokumen', $candidate['id']) }}" target="_blank" rel="noopener">
+                  Lihat Dokumen
+                </a>
+                <span class="table-muted">{{ $candidate['surat_tugas_nama'] ?? 'Surat tugas' }}</span>
+              @else
+                <span class="table-muted">Belum ada</span>
+              @endif
+            </td>
             <td><span class="badge badge-{{ strtolower($candidate['status']) }}">{{ $candidate['status'] }}</span></td>
             <td style="text-align:right;white-space:nowrap;">
               <form method="POST" action="{{ route('superadmin.seleksi-admin.ubah-status', $candidate['id']) }}" style="display:inline;">

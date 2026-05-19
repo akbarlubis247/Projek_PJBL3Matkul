@@ -12,7 +12,9 @@
   <main class="login-shell">
     <section class="login-panel register-panel">
       <div class="login-brand">
-        <img class="login-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Kampus Lapor">
+        <div class="login-brand-logo-wrap">
+          <img class="login-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Kampus Lapor">
+        </div>
         <div>
           <h1>Daftar Admin Kampus</h1>
           <p>Ajukan akses admin untuk universitas atau unit kampus</p>
@@ -23,7 +25,7 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
       @endif
 
-      <form method="POST" action="{{ route('admin-register.store') }}" class="login-form">
+      <form method="POST" action="{{ route('admin-register.store') }}" class="login-form" enctype="multipart/form-data">
         @csrf
         <div class="register-grid">
           <div class="form-group">
@@ -91,6 +93,13 @@
           <label for="alasan">Alasan Mendaftar</label>
           <textarea id="alasan" name="alasan" placeholder="Jelaskan kebutuhan akses admin untuk kampus atau unit Anda.">{{ old('alasan') }}</textarea>
           @error('alasan') <p class="field-error">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="form-group">
+          <label for="surat_tugas">Dokumen Surat Pernyataan Tugas</label>
+          <input id="surat_tugas" name="surat_tugas" type="file">
+          <p class="field-help">Upload dokumen surat tugas/pernyataan dari kampus. Format bebas, maksimal 10 MB.</p>
+          @error('surat_tugas') <p class="field-error">{{ $message }}</p> @enderror
         </div>
 
         <button class="btn btn-primary login-submit" type="submit">Kirim Pengajuan Admin</button>

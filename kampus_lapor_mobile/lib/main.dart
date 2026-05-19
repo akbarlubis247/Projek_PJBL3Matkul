@@ -191,28 +191,36 @@ class _CivitasHomePageState extends State<CivitasHomePage> {
         tags: _tags,
         locations: _locations,
         onMessage: _openMessageToReporter,
-        profilePhoto: _profilePhoto,
-        onProfileTap: _openProfile,
+      ),
+      _ReportListPage(
+        reports: _reports,
+        onRefresh: _syncReportStatuses,
+        refreshKey: _nim,
       ),
       _CreateReportPage(
         tags: _tags,
         locations: _locations,
         onSubmit: _addReport,
-        profilePhoto: _profilePhoto,
-        onProfileTap: _openProfile,
-      ),
-      _ReportListPage(
-        reports: _reports,
-        profilePhoto: _profilePhoto,
-        onProfileTap: _openProfile,
-        onRefresh: _syncReportStatuses,
-        refreshKey: _nim,
       ),
       _ChatPage(
         chats: _chats,
         onOpen: _openChat,
+      ),
+      _ProfileNavPage(
+        name: _name,
+        email: _email,
+        nim: _nim,
         profilePhoto: _profilePhoto,
-        onProfileTap: _openProfile,
+        reports: _reports,
+        onSave: (name, email, nim, photo) {
+          setState(() {
+            _name = name;
+            _email = email;
+            _nim = nim;
+            _profilePhoto = photo ?? _profilePhoto;
+          });
+        },
+        onLogout: _logoutFromNav,
       ),
     ];
 
@@ -228,19 +236,24 @@ class _CivitasHomePageState extends State<CivitasHomePage> {
             label: 'Beranda',
           ),
           const NavigationDestination(
-            icon: Icon(Icons.add_circle_outline),
-            selectedIcon: Icon(Icons.add_circle),
-            label: 'Buat',
-          ),
-          const NavigationDestination(
             icon: Icon(Icons.assignment_outlined),
             selectedIcon: Icon(Icons.assignment),
             label: 'Laporan',
           ),
+          const NavigationDestination(
+            icon: _CreateNavIcon(active: false),
+            selectedIcon: _CreateNavIcon(active: true),
+            label: 'Buat',
+          ),
           NavigationDestination(
             icon: chatIcon(Icons.chat_bubble_outline),
             selectedIcon: chatIcon(Icons.chat_bubble),
-            label: 'Chat',
+            label: 'Pesan',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            selectedIcon: Icon(Icons.person),
+            label: 'Profil',
           ),
         ],
       ),
@@ -250,7 +263,7 @@ class _CivitasHomePageState extends State<CivitasHomePage> {
   void _addReport(Report report) {
     setState(() {
       _reports.insert(0, report);
-      _index = 2;
+      _index = 1;
     });
     _sendReportToAdmin(report);
     ScaffoldMessenger.of(
@@ -489,35 +502,11 @@ class _CivitasHomePageState extends State<CivitasHomePage> {
     }
   }
 
-  void _openProfile() {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ProfilePage(
-          name: _name,
-          email: _email,
-          nim: _nim,
-          photoBytes: _profilePhoto,
-          reports: _reports,
-          onSave: (name, email, nim, photo) {
-            setState(() {
-              _name = name;
-              _email = email;
-              _nim = nim;
-              _profilePhoto = photo ?? _profilePhoto;
-            });
-          },
-          onLogout: _logout,
-        ),
-      ),
-    );
-  }
-
-  void _logout() {
+  void _logoutFromNav() {
     setState(() {
       _isLoggedIn = false;
       _index = 0;
     });
-    Navigator.of(context).pop();
   }
 
   void _login(Map<String, dynamic> user) {
@@ -911,14 +900,10 @@ class _Header extends StatelessWidget {
   const _Header({
     required this.title,
     required this.subtitle,
-    required this.profilePhoto,
-    required this.onProfileTap,
   });
 
   final String title;
   final String subtitle;
-  final Uint8List? profilePhoto;
-  final VoidCallback onProfileTap;
 
   @override
   Widget build(BuildContext context) {
@@ -928,49 +913,23 @@ class _Header extends StatelessWidget {
         color: Color(0xFF7C3AED),
         borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Color(0xFFEDE9FE),
-                    fontSize: 13,
-                  ),
-                ),
-              ],
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
             ),
           ),
-          InkWell(
-            onTap: onProfileTap,
-            borderRadius: BorderRadius.circular(999),
-            child: CircleAvatar(
-              radius: 27,
-              backgroundColor: const Color(0xFFEDE9FE),
-              backgroundImage: profilePhoto == null
-                  ? null
-                  : MemoryImage(profilePhoto!),
-              child: profilePhoto == null
-                  ? const Text(
-                      'CV',
-                      style: TextStyle(
-                        color: Color(0xFF5B21B6),
-                        fontWeight: FontWeight.w800,
-                      ),
-                    )
-                  : null,
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: const TextStyle(
+              color: Color(0xFFEDE9FE),
+              fontSize: 13,
             ),
           ),
         ],
@@ -985,16 +944,12 @@ class _HomePage extends StatefulWidget {
     required this.tags,
     required this.locations,
     required this.onMessage,
-    required this.profilePhoto,
-    required this.onProfileTap,
   });
 
   final List<Report> reports;
   final List<String> tags;
   final List<String> locations;
   final ValueChanged<Report> onMessage;
-  final Uint8List? profilePhoto;
-  final VoidCallback onProfileTap;
 
   @override
   State<_HomePage> createState() => _HomePageState();
@@ -1023,8 +978,6 @@ class _HomePageState extends State<_HomePage> {
         _Header(
           title: 'Kampus Lapor',
           subtitle: 'Cari barang hilang dan hubungi pelapor',
-          profilePhoto: widget.profilePhoto,
-          onProfileTap: widget.onProfileTap,
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -1088,15 +1041,11 @@ class _CreateReportPage extends StatefulWidget {
     required this.tags,
     required this.locations,
     required this.onSubmit,
-    required this.profilePhoto,
-    required this.onProfileTap,
   });
 
   final List<String> tags;
   final List<String> locations;
   final ValueChanged<Report> onSubmit;
-  final Uint8List? profilePhoto;
-  final VoidCallback onProfileTap;
 
   @override
   State<_CreateReportPage> createState() => _CreateReportPageState();
@@ -1123,8 +1072,6 @@ class _CreateReportPageState extends State<_CreateReportPage> {
         _Header(
           title: 'Buat Laporan',
           subtitle: 'Laporkan barang hilang atau fasilitas rusak',
-          profilePhoto: widget.profilePhoto,
-          onProfileTap: widget.onProfileTap,
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -1265,15 +1212,11 @@ class _CreateReportPageState extends State<_CreateReportPage> {
 class _ReportListPage extends StatelessWidget {
   const _ReportListPage({
     required this.reports,
-    required this.profilePhoto,
-    required this.onProfileTap,
     required this.onRefresh,
     required this.refreshKey,
   });
 
   final List<Report> reports;
-  final Uint8List? profilePhoto;
-  final VoidCallback onProfileTap;
   final Future<void> Function() onRefresh;
   final String refreshKey;
 
@@ -1283,8 +1226,6 @@ class _ReportListPage extends StatelessWidget {
       onRefresh: onRefresh,
       child: _ReportListBody(
         reports: reports,
-        profilePhoto: profilePhoto,
-        onProfileTap: onProfileTap,
         onRefresh: onRefresh,
         refreshKey: refreshKey,
       ),
@@ -1295,15 +1236,11 @@ class _ReportListPage extends StatelessWidget {
 class _ReportListBody extends StatefulWidget {
   const _ReportListBody({
     required this.reports,
-    required this.profilePhoto,
-    required this.onProfileTap,
     required this.onRefresh,
     required this.refreshKey,
   });
 
   final List<Report> reports;
-  final Uint8List? profilePhoto;
-  final VoidCallback onProfileTap;
   final Future<void> Function() onRefresh;
   final String refreshKey;
 
@@ -1334,8 +1271,6 @@ class _ReportListBodyState extends State<_ReportListBody> {
         _Header(
           title: 'Daftar Laporan',
           subtitle: 'Pantau status dari admin untuk laporan yang dibuat',
-          profilePhoto: widget.profilePhoto,
-          onProfileTap: widget.onProfileTap,
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -1359,14 +1294,10 @@ class _ChatPage extends StatelessWidget {
   const _ChatPage({
     required this.chats,
     required this.onOpen,
-    required this.profilePhoto,
-    required this.onProfileTap,
   });
 
   final List<ChatThread> chats;
   final ValueChanged<ChatThread> onOpen;
-  final Uint8List? profilePhoto;
-  final VoidCallback onProfileTap;
 
   @override
   Widget build(BuildContext context) {
@@ -1375,8 +1306,6 @@ class _ChatPage extends StatelessWidget {
         _Header(
           title: 'Chat Civitas',
           subtitle: 'Kirim pesan ke admin atau civitas lain',
-          profilePhoto: profilePhoto,
-          onProfileTap: onProfileTap,
         ),
         Padding(
           padding: const EdgeInsets.all(16),
@@ -1387,6 +1316,197 @@ class _ChatPage extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _ProfileNavPage extends StatefulWidget {
+  const _ProfileNavPage({
+    required this.name,
+    required this.email,
+    required this.nim,
+    required this.profilePhoto,
+    required this.reports,
+    required this.onSave,
+    required this.onLogout,
+  });
+
+  final String name;
+  final String email;
+  final String nim;
+  final Uint8List? profilePhoto;
+  final List<Report> reports;
+  final void Function(String name, String email, String nim, Uint8List? photo)
+  onSave;
+  final VoidCallback onLogout;
+
+  @override
+  State<_ProfileNavPage> createState() => _ProfileNavPageState();
+}
+
+class _ProfileNavPageState extends State<_ProfileNavPage> {
+  late final _name = TextEditingController(text: widget.name);
+  late final _email = TextEditingController(text: widget.email);
+  late final _nim = TextEditingController(text: widget.nim);
+  Uint8List? _photo;
+
+  @override
+  void initState() {
+    super.initState();
+    _photo = widget.profilePhoto;
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _nim.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Column(
+        children: [
+          const _Header(
+            title: 'Profil Civitas',
+            subtitle: 'Kelola akun dan riwayat laporan',
+          ),
+          Container(
+            color: const Color(0xFFF5F3FF),
+            child: const TabBar(
+              tabs: [
+                Tab(text: 'History'),
+                Tab(text: 'Akun'),
+              ],
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: [
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: widget.reports
+                      .map((report) => _ReportCard(report: report))
+                      .toList(),
+                ),
+                ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    Center(
+                      child: CircleAvatar(
+                        radius: 48,
+                        backgroundImage: _photo == null
+                            ? null
+                            : MemoryImage(_photo!),
+                        child: _photo == null ? const Text('CV') : null,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: _pickProfilePhoto,
+                      icon: const Icon(Icons.photo_camera),
+                      label: const Text('Ubah Foto Profil'),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _name,
+                      decoration: const InputDecoration(
+                        labelText: 'Nama',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _nim,
+                      decoration: const InputDecoration(
+                        labelText: 'NIM / ID',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: _email,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton(
+                      onPressed: () {
+                        widget.onSave(
+                          _name.text.trim(),
+                          _email.text.trim(),
+                          _nim.text.trim(),
+                          _photo,
+                        );
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Profil disimpan.')),
+                        );
+                      },
+                      child: const Text('Simpan Profil'),
+                    ),
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(
+                      onPressed: widget.onLogout,
+                      icon: const Icon(Icons.logout),
+                      label: const Text('Logout'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickProfilePhoto() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (file == null) return;
+    final bytes = await file.readAsBytes();
+    setState(() => _photo = bytes);
+  }
+}
+
+class _CreateNavIcon extends StatelessWidget {
+  const _CreateNavIcon({required this.active});
+
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: active ? 58 : 52,
+      height: active ? 48 : 42,
+      decoration: BoxDecoration(
+        color: active ? const Color(0xFF7C3AED) : const Color(0xFFDDD6FE),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(
+          color: active ? const Color(0xFF6D28D9) : const Color(0xFFC4B5FD),
+          width: active ? 2 : 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C3AED).withValues(alpha: active ? .36 : .18),
+            blurRadius: active ? 18 : 12,
+            offset: Offset(0, active ? 7 : 4),
+          ),
+        ],
+      ),
+      child: Icon(
+        Icons.add,
+        color: active ? Colors.white : const Color(0xFF6D28D9),
+        size: active ? 32 : 29,
+      ),
     );
   }
 }

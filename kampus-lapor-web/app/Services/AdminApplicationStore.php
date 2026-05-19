@@ -58,6 +58,10 @@ class AdminApplicationStore
             'role' => 'Calon Admin',
             'status' => 'Menunggu',
             'alasan' => $data['alasan'],
+            'surat_tugas_path' => $data['surat_tugas_path'] ?? null,
+            'surat_tugas_nama' => $data['surat_tugas_nama'] ?? null,
+            'surat_tugas_mime' => $data['surat_tugas_mime'] ?? null,
+            'surat_tugas_size' => $data['surat_tugas_size'] ?? null,
             'created_at' => now()->toIso8601String(),
             'updated_at' => now()->toIso8601String(),
         ]);
@@ -104,6 +108,34 @@ class AdminApplicationStore
         }
 
         return true;
+    }
+
+    public function document(string $id): ?array
+    {
+        if (! preg_match('/^[a-f\d]{24}$/i', $id)) {
+            return null;
+        }
+
+        $application = $this->applications->findOne(
+            ['_id' => new ObjectId($id)],
+            ['projection' => [
+                'surat_tugas_path' => 1,
+                'surat_tugas_nama' => 1,
+                'surat_tugas_mime' => 1,
+            ]]
+        );
+
+        if (! $application || empty($application['surat_tugas_path'])) {
+            return null;
+        }
+
+        $item = $application->getArrayCopy();
+
+        return [
+            'path' => $item['surat_tugas_path'],
+            'name' => $item['surat_tugas_nama'] ?? 'surat-tugas',
+            'mime' => $item['surat_tugas_mime'] ?? 'application/octet-stream',
+        ];
     }
 
     private function normalize(object|array $item): array

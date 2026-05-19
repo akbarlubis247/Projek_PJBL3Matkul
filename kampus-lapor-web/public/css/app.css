@@ -221,6 +221,7 @@ input[type=password] {
 input:focus, select:focus, textarea:focus { border-color: var(--green-500); box-shadow: 0 0 0 3px rgba(124,58,237,.14); }
 textarea { resize: vertical; min-height: 120px; }
 .field-error { margin-top: .35rem; color: #991b1b; font-size: .75rem; }
+.field-help { color: var(--muted); font-size: .78rem; margin-top: .35rem; }
 
 /* Alert */
 .alert { padding: .75rem 1rem; border-radius: .5rem; font-size: .875rem; margin-bottom: 1rem; }
@@ -386,11 +387,22 @@ textarea { resize: vertical; min-height: 120px; }
   box-shadow: 0 24px 80px rgba(15, 23, 42, .18);
 }
 .login-brand { display: flex; align-items: center; gap: .85rem; margin-bottom: 1.25rem; }
-.login-brand-logo {
+.login-brand-logo-wrap {
   width: 150px;
+  height: 86px;
+  border-radius: .75rem;
+  background: linear-gradient(135deg, var(--green-600), var(--green-800));
+  padding: .55rem .75rem;
+  box-shadow: 0 14px 30px rgba(124, 58, 237, .18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.login-brand-logo {
+  width: 100%;
   height: auto;
   display: block;
-  border-radius: .75rem;
 }
 .login-brand h1 { font-size: 1.4rem; font-weight: 800; }
 .login-brand p { color: var(--muted); font-size: .85rem; margin-top: .1rem; }

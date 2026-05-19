@@ -6,6 +6,7 @@ use App\Services\AdminApplicationStore;
 use App\Services\CampusDataStore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use MongoDB\Client;
 
 class AuthController extends Controller
@@ -42,6 +43,7 @@ class AuthController extends Controller
             'alamat_kampus' => ['nullable', 'string', 'max:220'],
             'unit' => ['required', 'string', 'max:120'],
             'alasan' => ['required', 'string', 'max:500'],
+            'surat_tugas' => ['required', 'file', 'max:10240'],
         ]);
 
         if ($this->usernameOrEmailTaken($data['username'], $data['email'])) {
@@ -49,6 +51,12 @@ class AuthController extends Controller
                 ->withInput($request->except('password'))
                 ->with('error', 'Username atau email sudah digunakan. Coba pakai data admin kampus yang lain.');
         }
+
+        $file = $request->file('surat_tugas');
+        $data['surat_tugas_path'] = $file->store('admin-applications');
+        $data['surat_tugas_nama'] = $file->getClientOriginalName();
+        $data['surat_tugas_mime'] = $file->getClientMimeType();
+        $data['surat_tugas_size'] = $file->getSize();
 
         $applications->create($data);
 
@@ -62,15 +70,14 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'username' => ['required', 'string'],
             'password' => ['required', 'string'],
-            'role' => ['required', 'in:admin,superadmin'],
         ]);
 
-        $user = $this->findUser($credentials['username'], $credentials['role']);
+        $user = $this->findUser($credentials['username']);
 
         if (! $user || ! Hash::check($credentials['password'], $user['password'] ?? '')) {
             return back()
-                ->withInput($request->only('username', 'role'))
-                ->with('error', 'Username, password, atau pilihan role tidak sesuai.');
+                ->withInput($request->only('username'))
+                ->with('error', 'Username atau password tidak sesuai.');
         }
 
         $request->session()->regenerate();
@@ -189,13 +196,13 @@ class AuthController extends Controller
             ->header('Access-Control-Allow-Origin', '*');
     }
 
-    private function findUser(string $username, string $role): ?array
+    private function findUser(string $username): ?array
     {
         $user = $this->database()
             ->selectCollection('users')
             ->findOne([
                 'username' => $username,
-                'role' => $role,
+                'role' => ['$in' => ['admin', 'superadmin']],
                 'status' => 'aktif',
             ]);
 
