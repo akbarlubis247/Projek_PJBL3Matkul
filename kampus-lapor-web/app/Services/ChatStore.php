@@ -18,11 +18,24 @@ class ChatStore
             ->selectCollection('chat_threads');
     }
 
-    public function threads(?array $participantIds = null): array
+    private function scopeFilter(?string $adminUsername = null, ?string $campusKey = null, array $filter = []): array
     {
-        $filter = [];
+        if ($adminUsername !== null && trim($adminUsername) !== '') {
+            $filter['admin_username'] = $adminUsername;
+        }
+
+        if ($campusKey !== null && trim($campusKey) !== '') {
+            $filter['campus_key'] = $campusKey;
+        }
+
+        return $filter;
+    }
+
+    public function threads(?array $participantIds = null, ?string $adminUsername = null, ?string $campusKey = null): array
+    {
+        $filter = $this->scopeFilter($adminUsername, $campusKey);
         if (is_array($participantIds)) {
-            $filter = ['participant_id' => ['$in' => $participantIds]];
+            $filter['participant_id'] = ['$in' => $participantIds];
         }
 
         $threads = $this->collection
@@ -32,18 +45,18 @@ class ChatStore
         return array_map(fn ($thread) => json_decode(json_encode($thread), true), $threads);
     }
 
-    public function unreadForAdmin(?array $participantIds = null): int
+    public function unreadForAdmin(?array $participantIds = null, ?string $adminUsername = null, ?string $campusKey = null): int
     {
-        return collect($this->threads($participantIds))
+        return collect($this->threads($participantIds, $adminUsername, $campusKey))
             ->filter(fn ($thread) => collect($thread['messages'] ?? [])->contains(
                 fn ($message) => ($message['sender_role'] ?? '') === 'civitas' && empty($message['read_by_admin'])
             ))
             ->count();
     }
 
-    public function markAdminRead(string $participantId): void
+    public function markAdminRead(string $participantId, ?string $adminUsername = null, ?string $campusKey = null): void
     {
-        $thread = $this->thread($participantId);
+        $thread = $this->thread($participantId, $adminUsername, $campusKey);
         if (! $thread) {
             return;
         }
@@ -55,15 +68,15 @@ class ChatStore
         }
 
         $this->collection->updateOne(
-            ['participant_id' => $participantId],
+            $this->scopeFilter($adminUsername, $campusKey, ['participant_id' => $participantId]),
             ['$set' => ['messages' => $thread['messages']]]
         );
     }
 
-    public function thread(string $participantId): ?array
+    public function thread(string $participantId, ?string $adminUsername = null, ?string $campusKey = null): ?array
     {
         $thread = $this->collection->findOne(
-            ['participant_id' => $participantId],
+            $this->scopeFilter($adminUsername, $campusKey, ['participant_id' => $participantId]),
             ['projection' => ['_id' => 0]]
         );
 
@@ -75,6 +88,9 @@ class ChatStore
         $participantId = $payload['sender_role'] === 'admin'
             ? $payload['receiver_id']
             : $payload['sender_id'];
+        $adminUsername = $payload['admin_username']
+            ?? ($payload['sender_role'] === 'admin' ? $payload['sender_id'] : $payload['receiver_id']);
+        $campusKey = $payload['campus_key'] ?? $adminUsername;
 
         $message = [
             'id' => (string) Str::uuid(),
@@ -89,7 +105,7 @@ class ChatStore
         ];
 
         $this->collection->updateOne(
-            ['participant_id' => $participantId],
+            $this->scopeFilter($adminUsername, $campusKey, ['participant_id' => $participantId]),
             [
                 '$setOnInsert' => [
                     'participant_id' => $participantId,
@@ -99,6 +115,8 @@ class ChatStore
                 ],
                 '$push' => ['messages' => $message],
                 '$set' => [
+                    'admin_username' => $adminUsername,
+                    'campus_key' => $campusKey,
                     'last_message' => $message['body'],
                     'last_at' => $message['created_at'],
                 ],

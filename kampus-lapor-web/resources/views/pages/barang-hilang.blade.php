@@ -31,7 +31,9 @@
                 <td>{{ $i+1 }}</td>
                 <td>
                   @if(!empty($item['foto']))
-                    <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaBarang'] }}" class="report-thumb">
+                    <button type="button" class="report-thumb-button" onclick='openImageModal(@json($item["foto"]))' title="Lihat Foto">
+                      <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaBarang'] }}" class="report-thumb">
+                    </button>
                   @else
                     <div class="report-thumb report-thumb-empty">IMG</div>
                   @endif
@@ -42,7 +44,7 @@
                 <td>{{ \Carbon\Carbon::parse($item['tanggal'])->isoFormat('D MMM YYYY') }}</td>
                 <td><span class="badge badge-{{ strtolower($item['status']) }}">{{ $item['status'] }}</span></td>
                 <td style="text-align:right;">
-                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"Foto"=>!empty($item["foto"]) ? "Ada" : "Tidak ada"]) }})' title="Detail">
+                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                   <form method="POST" action="{{ route('barang-hilang.ubah-status', $item['id']) }}" style="display:inline;">
@@ -68,7 +70,9 @@
                 <td>{{ $i+1 }}</td>
                 <td>
                   @if(!empty($item['foto']))
-                    <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaBarang'] }}" class="report-thumb">
+                    <button type="button" class="report-thumb-button" onclick='openImageModal(@json($item["foto"]))' title="Lihat Foto">
+                      <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaBarang'] }}" class="report-thumb">
+                    </button>
                   @else
                     <div class="report-thumb report-thumb-empty">IMG</div>
                   @endif
@@ -79,18 +83,18 @@
                 <td>{{ \Carbon\Carbon::parse($item['tanggal'])->isoFormat('D MMM YYYY') }}</td>
                 <td><span class="badge badge-ditemukan">{{ $item['status'] }}</span></td>
                 <td style="text-align:right;">
-                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"]]) }})' title="Detail">
+                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                   @if(($item['status'] ?? '') === 'Menunggu Diambil')
                   <form method="POST" action="{{ route('barang-ditemukan.diambil', $item['id']) }}" style="display:inline;">
                     @csrf @method('PATCH')
-                    <button type="submit" class="btn-icon-sm btn-icon-green" title="Tandai Sudah Diambil">
+                    <button type="submit" class="btn-icon-sm btn-icon-green" title="Verifikasi Sudah Diambil">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
                     </button>
                   </form>
                   @endif
-                  <form method="POST" action="{{ route('barang-ditemukan.hapus', $item['id']) }}" style="display:inline;" onsubmit="return confirm('Hapus laporan barang ditemukan {{ $item['namaBarang'] }}?')">
+                  <form method="POST" action="{{ route('barang-ditemukan.hapus', $item['id']) }}" style="display:inline;" onsubmit="return confirm('Hapus laporan barang ditemukan {{ $item['namaBarang'] }}? Status di mobile akan menjadi Barang Dihapus.')">
                     @csrf @method('DELETE')
                     <button type="submit" class="btn-icon-sm btn-icon-red" title="Hapus Laporan">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>

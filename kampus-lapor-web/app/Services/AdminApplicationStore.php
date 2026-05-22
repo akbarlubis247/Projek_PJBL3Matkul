@@ -34,12 +34,32 @@ class AdminApplicationStore
     {
         $items = $this->users
             ->find(
-                ['role' => 'admin'],
+                ['role' => 'admin', 'status' => 'aktif'],
                 ['projection' => ['password' => 0], 'sort' => ['created_at' => -1, 'name' => 1]]
             )
             ->toArray();
 
         return array_map(fn ($item) => $this->normalize($item), $items);
+    }
+
+    public function activeIdentityExists(string $username, string $email): bool
+    {
+        $existingUser = $this->users->findOne([
+            '$or' => [
+                ['username' => $username],
+                ['email' => $email],
+            ],
+        ]);
+
+        $existingApplication = $this->applications->findOne([
+            'status' => ['$nin' => ['Ditolak', 'Banned']],
+            '$or' => [
+                ['username' => $username],
+                ['email' => $email],
+            ],
+        ]);
+
+        return (bool) ($existingUser || $existingApplication);
     }
 
     public function create(array $data): string
@@ -80,6 +100,10 @@ class AdminApplicationStore
             return false;
         }
 
+        if (($application['status'] ?? null) === 'Banned' && $status !== 'Banned') {
+            return false;
+        }
+
         $this->applications->updateOne(
             ['_id' => new ObjectId($id)],
             ['$set' => ['status' => $status, 'updated_at' => now()->toIso8601String()]]
@@ -105,6 +129,13 @@ class AdminApplicationStore
                 ], '$setOnInsert' => ['created_at' => now()->toIso8601String()]],
                 ['upsert' => true]
             );
+        } elseif ($status === 'Ditolak') {
+            $this->users->updateOne(
+                ['username' => $application['username'], 'role' => 'admin'],
+                ['$set' => ['status' => 'tidak aktif', 'updated_at' => now()->toIso8601String()]]
+            );
+        } elseif ($status === 'Banned') {
+            $this->users->deleteOne(['username' => $application['username'], 'role' => 'admin']);
         }
 
         return true;

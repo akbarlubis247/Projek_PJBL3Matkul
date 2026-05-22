@@ -31,7 +31,9 @@
                 <td>{{ $i+1 }}</td>
                 <td>
                   @if(!empty($item['foto']))
-                    <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaFasilitas'] }}" class="report-thumb">
+                    <button type="button" class="report-thumb-button" onclick='openImageModal(@json($item["foto"]))' title="Lihat Foto">
+                      <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaFasilitas'] }}" class="report-thumb">
+                    </button>
                   @else
                     <div class="report-thumb report-thumb-empty">IMG</div>
                   @endif
@@ -42,7 +44,7 @@
                 <td>{{ \Carbon\Carbon::parse($item['tanggal'])->isoFormat('D MMM YYYY') }}</td>
                 <td><span class="badge badge-{{ $item['status']==='Dilaporkan' ? 'dilaporkan' : 'sedang' }}">{{ $item['status'] }}</span></td>
                 <td style="text-align:right;">
-                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Fasilitas"=>$item["namaFasilitas"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"]]) }})' title="Detail">
+                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Fasilitas"=>$item["namaFasilitas"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                   <form method="POST" action="{{ route('fasilitas-diperbaiki.hapus', $item['id']) }}" style="display:inline;" onsubmit="return confirm('Hapus laporan fasilitas diperbaiki {{ $item['namaFasilitas'] }}?')">
@@ -74,7 +76,9 @@
                 <td>{{ $i+1 }}</td>
                 <td>
                   @if(!empty($item['foto']))
-                    <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaFasilitas'] }}" class="report-thumb">
+                    <button type="button" class="report-thumb-button" onclick='openImageModal(@json($item["foto"]))' title="Lihat Foto">
+                      <img src="{{ $item['foto'] }}" alt="Foto {{ $item['namaFasilitas'] }}" class="report-thumb">
+                    </button>
                   @else
                     <div class="report-thumb report-thumb-empty">IMG</div>
                   @endif
@@ -85,7 +89,7 @@
                 <td>{{ \Carbon\Carbon::parse($item['tanggal'])->isoFormat('D MMM YYYY') }}</td>
                 <td><span class="badge badge-diperbaiki">{{ $item['status'] }}</span></td>
                 <td style="text-align:right;">
-                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Fasilitas"=>$item["namaFasilitas"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"]]) }})' title="Detail">
+                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Fasilitas"=>$item["namaFasilitas"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                   </button>
                   <form method="POST" action="{{ route('fasilitas-diperbaiki.hapus', $item['id']) }}" style="display:inline;" onsubmit="return confirm('Kembalikan laporan {{ $item['namaFasilitas'] }} ke fasilitas rusak?')">

@@ -39,7 +39,7 @@ Mobile civitas:
 
 - Laravel 12
 - PHP 8.2
-- MongoDB lokal
+- MongoDB lokal atau MongoDB Atlas
 - Flutter
 - Dart
 - Tailwind/CSS custom
@@ -48,19 +48,44 @@ Mobile civitas:
 
 ## Database
 
-Project ini menggunakan MongoDB lokal dengan nama database:
+Project ini menggunakan MongoDB dengan nama database:
 
 ```text
 kampus_lapor
 ```
 
-Pastikan MongoDB sudah berjalan di:
+Untuk mode lokal, pastikan MongoDB sudah berjalan di:
 
 ```text
 127.0.0.1:27017
 ```
 
 Bisa dicek lewat MongoDB Compass.
+
+Untuk mode MongoDB Atlas, isi `.env` Laravel seperti ini:
+
+```env
+DB_CONNECTION=mongodb
+DB_URI=mongodb+srv://dbuser:PASSWORD_ATLAS@cluster0.u8ejsmt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+DB_DATABASE=kampus_lapor
+MONGODB_DATABASE=kampus_lapor
+LOCAL_MONGODB_URI=mongodb://127.0.0.1:27017
+LOCAL_MONGODB_DATABASE=kampus_lapor
+```
+
+Setelah mengganti `.env`, bersihkan cache config:
+
+```bash
+php artisan config:clear
+```
+
+Untuk menyamakan semua collection dari MongoDB lokal ke Atlas:
+
+```bash
+php artisan mongo:sync-to-atlas --drop
+```
+
+Collection utama yang dipakai project antara lain `users`, `admin_applications`, `campus_locations`, `campus_reports`, `chat_threads`, `notifications`, `sessions`, `cache`, `jobs`, `failed_jobs`, `conversations`, dan `messages`.
 
 ## Akun Demo
 
@@ -196,6 +221,7 @@ Jika halaman tidak bisa connect ke MongoDB:
 
 - Pastikan MongoDB sudah running.
 - Pastikan database bernama `kampus_lapor`.
+- Kalau memakai Atlas, pastikan password di `DB_URI` benar dan IP laptop sudah diizinkan di Network Access Atlas.
 - Pastikan `.env` berisi:
 
 ```env

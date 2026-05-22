@@ -50,7 +50,7 @@
           @if($hasUnread)<span class="chat-unread-dot"></span>@endif
         </button>
       @empty
-        <div class="chat-empty" style="margin:1rem;">Belum ada civitas untuk kampus ini.</div>
+        <div class="chat-empty" style="margin:1rem;">Belum ada civitas yang mengirim chat ke admin.</div>
       @endforelse
     </div>
   </aside>
@@ -67,7 +67,7 @@
 
     <div class="chat-messages" id="chatMessages"></div>
 
-    <form method="POST" action="{{ route('pesan.kirim') }}" class="chat-composer" id="chatComposer" data-action="{{ route('pesan.kirim') }}">
+    <form method="POST" action="{{ route('chat.send') }}" class="chat-composer" id="chatComposer" data-action="{{ route('chat.send') }}">
       @csrf
       <input type="hidden" name="penerima" id="penerimaInput" value="{{ $activeUser['nama'] }}">
       <input type="hidden" id="receiverIdInput" value="{{ $activeUser['nim'] }}">
@@ -78,7 +78,7 @@
       </button>
     </form>
     @else
-    <div class="chat-empty">Chat masih kosong. Tambahkan civitas kampus dulu agar admin bisa berkirim pesan.</div>
+    <div class="chat-empty">Belum ada chat masuk. Percakapan akan muncul setelah civitas mengirim pesan ke admin.</div>
     @endif
   </section>
 </div>
@@ -142,9 +142,15 @@ function openChatContact(button) {
     }
   }).then(r => r.json()).then(data => {
     const badge = document.querySelector('.notif-count');
-    if (!badge) return;
-    if (data.unread > 0) badge.textContent = data.unread;
-    else badge.remove();
+    if (badge) {
+      if (data.unread > 0) badge.textContent = data.unread;
+      else badge.remove();
+    }
+    const sidebarBadge = document.querySelector('.sidebar-badge');
+    if (sidebarBadge) {
+      if (data.unread > 0) sidebarBadge.textContent = data.unread;
+      else sidebarBadge.remove();
+    }
   }).catch(() => {});
 }
 
@@ -157,12 +163,18 @@ if (chatComposer) chatComposer.addEventListener('submit', function(event) {
   const receiverId = document.getElementById('receiverIdInput').value;
   const text = input.value.trim();
   if (!text) return;
+  const adminId = @json(session('auth_username', 'admin1'));
+  const adminName = @json(session('auth_name', 'Admin Kampus'));
+  const campusKey = @json(session('auth_kode_kampus') ?: session('auth_kampus') ?: session('auth_username', 'admin1'));
 
   const message = {
-    sender_id: 'admin1',
-    sender_name: 'Admin Kampus',
+    sender_id: adminId,
+    sender_name: adminName,
     sender_role: 'admin',
+    admin_username: adminId,
+    campus_key: campusKey,
     receiver_id: receiverId,
+    receiver_identifier: receiverId,
     receiver_name: receiver,
     body: text
   };
@@ -179,8 +191,25 @@ if (chatComposer) chatComposer.addEventListener('submit', function(event) {
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
       'Accept': 'application/json'
     },
-    body: JSON.stringify({ penerima: receiver, isi: text })
-  }).catch(() => {});
+    body: JSON.stringify(message)
+  }).then(r => {
+    if (!r.ok) throw new Error('Gagal mengirim pesan');
+    return r.json();
+  }).then(data => {
+    const savedMessage = data.message || data.chat_message;
+    if (savedMessage) {
+      activeThread = activeThread || { participant_id: receiverId, messages: [] };
+      activeThread.messages = activeThread.messages.filter(item => item.id || item.body !== text || item.sender_role !== 'admin');
+      activeThread.messages.push(savedMessage);
+      activeThread.last_message = savedMessage.body;
+      activeThread.last_at = savedMessage.created_at;
+      renderMessages(activeThread);
+    }
+  }).catch(() => {
+    activeThread.messages = activeThread.messages.filter(item => item.id || item.body !== text || item.sender_role !== 'admin');
+    renderMessages(activeThread);
+    alert('Pesan gagal dikirim. Coba refresh halaman lalu kirim ulang.');
+  });
 });
 
 document.addEventListener('DOMContentLoaded', function() {

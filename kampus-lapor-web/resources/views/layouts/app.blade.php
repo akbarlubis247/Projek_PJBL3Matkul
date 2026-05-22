@@ -38,6 +38,9 @@
           <a href="{{ route($menu['route']) }}" class="sidebar-link {{ request()->routeIs($menu['route']) ? 'active' : '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $menu['icon'] !!}</svg>
             {{ $menu['label'] }}
+            @if(!$isSuperadminArea && $menu['route'] === 'pesan' && ($adminUnreadChatCount ?? 0) > 0)
+              <span class="sidebar-badge">{{ $adminUnreadChatCount }}</span>
+            @endif
             @if(request()->routeIs($menu['route']))
               <svg class="chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
             @endif
@@ -115,6 +118,21 @@
   </div>
 </div>
 
+<!-- Modal Preview Foto -->
+<div class="modal-backdrop image-modal" id="modalImage" style="display:none;">
+  <div class="image-modal-box">
+    <button class="modal-close image-modal-close" onclick="closeImageModal()">&times;</button>
+    <div class="image-modal-toolbar">
+      <button class="btn btn-outline" onclick="zoomImage(-0.2)" type="button">-</button>
+      <button class="btn btn-outline" onclick="resetImageZoom()" type="button">Reset</button>
+      <button class="btn btn-outline" onclick="zoomImage(0.2)" type="button">+</button>
+    </div>
+    <div class="image-modal-stage">
+      <img id="modalImagePreview" src="" alt="Preview foto laporan">
+    </div>
+  </div>
+</div>
+
 <!-- Modal Profil User -->
 <div class="modal-backdrop" id="modalProfil" style="display:none;">
   <div class="modal-box">
@@ -144,10 +162,37 @@ function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 function showDetail(data) {
   let html = '';
   for (const [key, val] of Object.entries(data)) {
+    if (key === 'FotoUrl') {
+      if (val) {
+        html += `<div class="modal-field"><dt>Foto</dt><dd><button class="btn btn-outline" onclick="openImageModal('${val.replace(/'/g, '&#39;')}')" type="button">Lihat Foto</button></dd></div>`;
+      }
+      continue;
+    }
     html += `<div class="modal-field"><dt>${key}</dt><dd>${val}</dd></div>`;
   }
   document.getElementById('modalDetailBody').innerHTML = html;
   openModal('modalDetail');
+}
+
+let imageZoom = 1;
+function openImageModal(src) {
+  imageZoom = 1;
+  const image = document.getElementById('modalImagePreview');
+  image.src = src;
+  image.style.transform = 'scale(1)';
+  openModal('modalImage');
+}
+function closeImageModal() {
+  closeModal('modalImage');
+  document.getElementById('modalImagePreview').src = '';
+}
+function zoomImage(delta) {
+  imageZoom = Math.min(4, Math.max(0.4, imageZoom + delta));
+  document.getElementById('modalImagePreview').style.transform = `scale(${imageZoom})`;
+}
+function resetImageZoom() {
+  imageZoom = 1;
+  document.getElementById('modalImagePreview').style.transform = 'scale(1)';
 }
 function showProfil(data) {
   document.getElementById('modalProfilBody').innerHTML = `

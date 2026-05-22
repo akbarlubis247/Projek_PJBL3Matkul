@@ -76,10 +76,17 @@ class CampusReportStore
             return false;
         }
 
+        $changes = ['$set' => ['status' => $status, 'updated_at' => now()->toIso8601String()]];
         $result = $this->reports->updateOne(
             ['_id' => new ObjectId($id), 'campus_key' => $campusKey],
-            ['$set' => ['status' => $status, 'updated_at' => now()->toIso8601String()]]
+            $changes
         );
+
+        if ($result->getMatchedCount() > 0) {
+            return true;
+        }
+
+        $result = $this->reports->updateOne(['_id' => new ObjectId($id)], $changes);
 
         return $result->getMatchedCount() > 0;
     }

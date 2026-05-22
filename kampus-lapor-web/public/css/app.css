@@ -59,6 +59,22 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .sidebar-link.active { background: var(--sidebar-active); color: white; font-weight: 500; }
 .sidebar-link svg { width: 20px; height: 20px; flex-shrink: 0; }
 .sidebar-link .chevron { margin-left: auto; opacity: .5; width: 16px; height: 16px; }
+.sidebar-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #ef4444;
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(239,68,68,.28);
+}
+.sidebar-link .sidebar-badge + .chevron { margin-left: .5rem; }
 
 .sidebar-footer { margin-top: auto; padding: 1rem; }
 .sidebar-user-card {
@@ -295,6 +311,12 @@ textarea { resize: vertical; min-height: 120px; }
 .modal-field { margin-bottom: .75rem; }
 .modal-field dt { font-size: .75rem; color: var(--muted); margin-bottom: .2rem; }
 .modal-field dd { font-size: .875rem; font-weight: 500; }
+.image-modal { background: rgba(15,23,42,.86); }
+.image-modal-box { position: relative; width: min(94vw, 980px); height: min(88vh, 760px); background: #0f172a; border-radius: .75rem; padding: 3.75rem 1rem 1rem; box-shadow: 0 20px 70px rgba(0,0,0,.35); }
+.image-modal-close { position: absolute; top: .75rem; right: .9rem; color: white; z-index: 2; }
+.image-modal-toolbar { position: absolute; top: .75rem; left: 1rem; display: flex; gap: .5rem; z-index: 2; }
+.image-modal-stage { width: 100%; height: 100%; overflow: auto; display: flex; align-items: center; justify-content: center; background: #020617; border-radius: .5rem; }
+.image-modal-stage img { max-width: 100%; max-height: 100%; object-fit: contain; transform-origin: center center; transition: transform .16s ease; }
 .table-muted { display: block; color: var(--muted); font-size: .75rem; margin-top: .2rem; font-weight: 400; }
 .report-thumb {
   width: 56px;
@@ -304,6 +326,8 @@ textarea { resize: vertical; min-height: 120px; }
   border: 1px solid var(--border);
   background: #f8fafc;
 }
+.report-thumb-button { border: 0; background: transparent; padding: 0; cursor: zoom-in; border-radius: .5rem; }
+.report-thumb-button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .report-thumb-empty {
   display: inline-flex;
   align-items: center;

@@ -1,34 +1,39 @@
 <?php
 
-use App\Http\Controllers\Api\KampusLaporApiController;
+use App\Http\Controllers\Api\AuthApiController;
+use App\Http\Controllers\Api\CampusApiController;
+use App\Http\Controllers\Api\ChatApiController;
+use App\Http\Controllers\Api\NotificationApiController;
+use App\Http\Controllers\Api\ReportApiController;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/auth/login/super-admin', [KampusLaporApiController::class, 'loginSuperAdmin']);
-Route::post('/auth/login/admin-kampus', [KampusLaporApiController::class, 'loginAdminKampus']);
-Route::post('/auth/login/civitas', [KampusLaporApiController::class, 'loginCivitas']);
-Route::post('/kampus/register', [KampusLaporApiController::class, 'registerKampus']);
-Route::post('/civitas/register', [KampusLaporApiController::class, 'registerCivitas']);
+Route::post('/auth/login/super-admin', [AuthApiController::class, 'loginSuperAdmin']);
+Route::post('/auth/login/admin-kampus', [AuthApiController::class, 'loginAdminKampus']);
+Route::post('/auth/login/civitas', [AuthApiController::class, 'loginCivitas']);
+Route::post('/kampus/register', [AuthApiController::class, 'registerKampus']);
+Route::post('/civitas/register', [AuthApiController::class, 'registerCivitas']);
 
-Route::get('/super-admin/kampus', [KampusLaporApiController::class, 'kampusList']);
-Route::patch('/super-admin/kampus/{id}/status', [KampusLaporApiController::class, 'kampusStatus']);
+Route::get('/super-admin/kampus', [CampusApiController::class, 'kampusList']);
+Route::patch('/super-admin/kampus/{id}/status', [CampusApiController::class, 'kampusStatus']);
 
-Route::get('/admin-kampus/civitas', [KampusLaporApiController::class, 'civitasList']);
-Route::patch('/admin-kampus/civitas/{id}/status', [KampusLaporApiController::class, 'civitasStatus']);
-Route::get('/kampus/approved', [KampusLaporApiController::class, 'approvedKampus']);
+Route::get('/admin-kampus/civitas', [CampusApiController::class, 'civitasList']);
+Route::patch('/admin-kampus/civitas/{id}/status', [CampusApiController::class, 'civitasStatus']);
+Route::get('/kampus/approved', [CampusApiController::class, 'approvedKampus']);
 
-Route::post('/laporan-barang', [KampusLaporApiController::class, 'storeLaporanBarang']);
-Route::get('/laporan-barang', [KampusLaporApiController::class, 'laporanBarang']);
-Route::get('/laporan-barang/{id}', [KampusLaporApiController::class, 'laporanDetail']);
-Route::patch('/laporan-barang/{id}/status', [KampusLaporApiController::class, 'laporanStatus']);
-Route::patch('/laporan-barang/{id}', [KampusLaporApiController::class, 'laporanUpdate']);
+Route::post('/laporan-barang', [ReportApiController::class, 'storeLaporanBarang']);
+Route::get('/laporan-barang', [ReportApiController::class, 'laporanBarang']);
+Route::get('/laporan-barang/{id}', [ReportApiController::class, 'laporanDetail']);
+Route::patch('/laporan-barang/{id}/status', [ReportApiController::class, 'laporanStatus']);
+Route::patch('/laporan-barang/{id}', [ReportApiController::class, 'laporanUpdate']);
 
-Route::post('/laporan-fasilitas', [KampusLaporApiController::class, 'storeLaporanFasilitas']);
-Route::get('/laporan-fasilitas', [KampusLaporApiController::class, 'laporanFasilitas']);
-Route::get('/laporan-fasilitas/{id}', [KampusLaporApiController::class, 'laporanDetail']);
-Route::patch('/laporan-fasilitas/{id}/status', [KampusLaporApiController::class, 'laporanStatus']);
+Route::post('/laporan-fasilitas', [ReportApiController::class, 'storeLaporanFasilitas']);
+Route::get('/laporan-fasilitas', [ReportApiController::class, 'laporanFasilitas']);
+Route::get('/laporan-fasilitas/{id}', [ReportApiController::class, 'laporanDetail']);
+Route::patch('/laporan-fasilitas/{id}/status', [ReportApiController::class, 'laporanStatus']);
+Route::get('/mobile/reports/{reporterId}', [ReportApiController::class, 'laporanByReporter']);
 
-Route::post('/chats', [KampusLaporApiController::class, 'storeChat']);
-Route::get('/chats/{participantId}', [KampusLaporApiController::class, 'chatThread']);
+Route::post('/chats', [ChatApiController::class, 'storeChat']);
+Route::get('/chats/{participantId}', [ChatApiController::class, 'chatThread']);
 
-Route::get('/notifikasi', [KampusLaporApiController::class, 'notifications']);
-Route::patch('/notifikasi/{id}/read', [KampusLaporApiController::class, 'notificationRead']);
+Route::get('/notifikasi', [NotificationApiController::class, 'notifications']);
+Route::patch('/notifikasi/{id}/read', [NotificationApiController::class, 'notificationRead']);

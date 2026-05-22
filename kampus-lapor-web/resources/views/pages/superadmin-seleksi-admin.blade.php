@@ -23,8 +23,8 @@
     <div class="stat-sub">Pengajuan perlu perbaikan data</div>
   </div>
   <div class="stat-card">
-    <div class="stat-top"><span class="stat-label">Database</span><span class="stat-icon" style="background:#dbeafe;color:#3b82f6;">MongoDB</span></div>
-    <div class="stat-sub">kampus_lapor lokal</div>
+    <div class="stat-top"><span class="stat-label">Banned</span><span class="stat-icon" style="background:#fee2e2;color:#b91c1c;">{{ $summary['banned'] }}</span></div>
+    <div class="stat-sub">Akun tidak bisa digunakan lagi</div>
   </div>
 </div>
 
@@ -59,6 +59,9 @@
                 <a class="btn btn-outline" href="{{ route('superadmin.seleksi-admin.dokumen', $candidate['id']) }}" target="_blank" rel="noopener">
                   Lihat Dokumen
                 </a>
+                <a class="btn btn-outline" href="{{ route('superadmin.seleksi-admin.dokumen.download', $candidate['id']) }}">
+                  Download
+                </a>
                 <span class="table-muted">{{ $candidate['surat_tugas_nama'] ?? 'Surat tugas' }}</span>
               @else
                 <span class="table-muted">Belum ada</span>
@@ -66,6 +69,9 @@
             </td>
             <td><span class="badge badge-{{ strtolower($candidate['status']) }}">{{ $candidate['status'] }}</span></td>
             <td style="text-align:right;white-space:nowrap;">
+              @if(($candidate['status'] ?? '') === 'Banned')
+                <span class="table-muted">History banned</span>
+              @else
               <form method="POST" action="{{ route('superadmin.seleksi-admin.ubah-status', $candidate['id']) }}" style="display:inline;">
                 @csrf @method('PATCH')
                 <input type="hidden" name="status" value="Disetujui">
@@ -80,6 +86,14 @@
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
               </form>
+              <form method="POST" action="{{ route('superadmin.seleksi-admin.ubah-status', $candidate['id']) }}" style="display:inline;" onsubmit="return confirm('Banned akun admin {{ $candidate['nama'] }}? Akun tidak bisa digunakan dan data admin aktif akan dihapus.')">
+                @csrf @method('PATCH')
+                <input type="hidden" name="status" value="Banned">
+                <button class="btn-icon-sm btn-icon-red" title="Banned admin" type="submit">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                </button>
+              </form>
+              @endif
             </td>
           </tr>
           @endforeach

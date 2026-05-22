@@ -22,9 +22,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('layouts.app', function ($view) {
-            $unreadCount = session('auth_role') === 'admin' && session('auth_username') !== 'admin1'
-                ? 0
-                : app(ChatStore::class)->unreadForAdmin();
+            $adminUsername = session('auth_username', 'admin1');
+            $campusKey = session('auth_kode_kampus')
+                ?: session('auth_kampus')
+                ?: $adminUsername;
+            $unreadCount = session('auth_role') === 'admin'
+                ? app(ChatStore::class)->unreadForAdmin(null, $adminUsername, $campusKey)
+                : 0;
 
             $view->with('adminUnreadChatCount', $unreadCount);
         });

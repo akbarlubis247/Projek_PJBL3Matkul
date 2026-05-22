@@ -8,10 +8,6 @@ Route::post('/login', [AuthController::class, 'authenticate'])->name('login.auth
 Route::get('/daftar-admin', [AuthController::class, 'showAdminRegistration'])->name('admin-register');
 Route::post('/daftar-admin', [AuthController::class, 'storeAdminRegistration'])->name('admin-register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/mobile/register', [AuthController::class, 'mobileRegister'])->name('mobile.register');
-Route::post('/mobile/login', [AuthController::class, 'mobileLogin'])->name('mobile.login');
-Route::post('/mobile/reports', [DashboardController::class, 'mobileReportStore'])->name('mobile.reports.store');
-Route::get('/mobile/reports/{reporterId}', [DashboardController::class, 'mobileReports'])->name('mobile.reports.index');
 Route::post('/chat/send', [DashboardController::class, 'chatSend'])->name('chat.send');
 Route::get('/chat/thread/{participantId}', [DashboardController::class, 'chatThread'])->name('chat.thread');
 Route::post('/chat/thread/{participantId}/read', [DashboardController::class, 'chatMarkRead'])->name('chat.read');
@@ -40,5 +36,6 @@ Route::middleware(['role:superadmin'])->group(function () {
     Route::get('/superadmin/admin-aktif', [DashboardController::class, 'adminAktif'])->name('superadmin.admin-aktif');
     Route::get('/superadmin/data-kampus', [DashboardController::class, 'dataKampus'])->name('superadmin.data-kampus');
     Route::get('/superadmin/seleksi-admin/{id}/dokumen', [DashboardController::class, 'lihatDokumenAdmin'])->name('superadmin.seleksi-admin.dokumen');
+    Route::get('/superadmin/seleksi-admin/{id}/dokumen/download', [DashboardController::class, 'downloadDokumenAdmin'])->name('superadmin.seleksi-admin.dokumen.download');
     Route::patch('/superadmin/seleksi-admin/{id}', [DashboardController::class, 'ubahStatusAdmin'])->name('superadmin.seleksi-admin.ubah-status');
 });

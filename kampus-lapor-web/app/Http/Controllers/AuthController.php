@@ -37,10 +37,10 @@ class AuthController extends Controller
             'email' => ['required', 'email', 'max:160'],
             'password' => ['required', 'string', 'min:6'],
             'nidn' => ['required', 'string', 'max:60'],
-            'phone' => ['nullable', 'string', 'max:40'],
+            'phone' => ['required', 'string', 'max:40'],
             'kampus' => ['required', 'string', 'max:160'],
-            'kode_kampus' => ['nullable', 'string', 'max:80'],
-            'alamat_kampus' => ['nullable', 'string', 'max:220'],
+            'kode_kampus' => ['required', 'string', 'max:80'],
+            'alamat_kampus' => ['required', 'string', 'max:220'],
             'unit' => ['required', 'string', 'max:120'],
             'alasan' => ['required', 'string', 'max:500'],
             'surat_tugas' => ['required', 'file', 'max:10240'],
@@ -243,7 +243,7 @@ class AuthController extends Controller
         ]);
 
         $existingApplication = $database->selectCollection('admin_applications')->findOne([
-            'status' => ['$ne' => 'Ditolak'],
+            'status' => ['$nin' => ['Ditolak', 'Banned']],
             '$or' => [
                 ['username' => $username],
                 ['email' => $email],
