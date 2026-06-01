@@ -213,7 +213,13 @@ if (chatComposer) chatComposer.addEventListener('submit', function(event) {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  const first = document.querySelector('.chat-contact.active') || document.querySelector('.chat-contact');
+  const urlParams = new URLSearchParams(window.location.search);
+  const nim = urlParams.get('nim');
+  let selected = null;
+  if (nim) {
+    selected = document.querySelector(`.chat-contact[data-nim="${nim.toLowerCase()}"]`);
+  }
+  const first = selected || document.querySelector('.chat-contact.active') || document.querySelector('.chat-contact');
   if (first) openChatContact(first);
 });
 

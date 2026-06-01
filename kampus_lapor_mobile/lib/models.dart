@@ -29,6 +29,8 @@ class Report {
     this.photoBytes,
     this.remoteId,
     this.hasUnreadUpdate = false,
+    this.reporterId,
+    this.reporterPhoto,
   });
 
   String title;
@@ -42,6 +44,8 @@ class Report {
   Uint8List? photoBytes;
   String? remoteId;
   bool hasUnreadUpdate;
+  String? reporterId;
+  Uint8List? reporterPhoto;
 }
 
 class ChatThread {
@@ -51,6 +55,8 @@ class ChatThread {
     required this.messages,
     this.time = 'Baru',
     this.hasUnread = false,
+    this.peerId,
+    this.profilePhoto,
   });
 
   String name;
@@ -58,6 +64,8 @@ class ChatThread {
   String time;
   List<ChatMessage> messages;
   bool hasUnread;
+  String? peerId;
+  Uint8List? profilePhoto;
 }
 
 class ChatMessage {

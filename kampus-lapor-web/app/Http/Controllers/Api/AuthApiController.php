@@ -6,6 +6,8 @@ use App\Services\AdminApplicationStore;
 use App\Services\CampusDataStore;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\ApiToken;
+use Illuminate\Support\Str;
 
 class AuthApiController extends BaseApiController
 {
@@ -35,7 +37,16 @@ class AuthApiController extends BaseApiController
         $payload = $this->publicUser($user);
         $payload['locations'] = $campusData->locations($payload['campus_key'] ?? $payload['kode_kampus'] ?? '');
 
-        return response()->json(['message' => 'Login berhasil.', 'user' => $payload]);
+        $token = Str::random(60);
+        ApiToken::create([
+            'user_id' => (string) $user['_id'],
+            'token' => hash('sha256', $token),
+            'created_at' => now()->toIso8601String(),
+        ]);
+
+        $payload['token'] = $token;
+
+        return response()->json(['message' => 'Login berhasil.', 'user' => $payload, 'token' => $token]);
     }
 
     public function registerKampus(Request $request, AdminApplicationStore $applications)
@@ -109,7 +120,57 @@ class AuthApiController extends BaseApiController
             return response()->json(['message' => 'Username atau password tidak sesuai.'], 422);
         }
 
-        return response()->json(['user' => $this->publicUser($user)]);
+        $token = Str::random(60);
+        ApiToken::create([
+            'user_id' => (string) $user['_id'],
+            'token' => hash('sha256', $token),
+            'created_at' => now()->toIso8601String(),
+        ]);
+
+        $userPayload = $this->publicUser($user);
+        $userPayload['token'] = $token;
+
+        return response()->json(['user' => $userPayload, 'token' => $token]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user() ?: $request->auth_user;
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized.'], 401);
+        }
+
+        $data = $request->validate([
+            'name' => 'required|string|max:120',
+            'email' => 'required|email|max:160',
+            'nim' => 'required|string|max:60',
+            'profile_photo' => 'nullable|string',
+        ]);
+
+        $updateData = [
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'nim' => $data['nim'],
+            'username' => $data['nim'],
+            'identifier' => $data['nim'],
+            'updated_at' => now()->toIso8601String(),
+        ];
+
+        if (array_key_exists('profile_photo', $data)) {
+            $updateData['profile_photo'] = $data['profile_photo'];
+        }
+
+        // Menggunakan forceFill pada Eloquent Model agar data non-fillable (seperti profile_photo) tetap dapat diupdate
+        $user->forceFill($updateData)->save();
+
+        // Ambil data terbaru dalam bentuk raw document menggunakan BSON ObjectId agar kompatibel dengan publicUser()
+        $updatedUser = $this->users()->findOne(['_id' => new \MongoDB\BSON\ObjectId($user->id)]);
+        $payload = $this->publicUser($updatedUser);
+
+        return response()->json([
+            'message' => 'Profil berhasil diperbarui.',
+            'user' => $payload
+        ]);
     }
 
     private function findAdminByDomain(string $domain): ?array

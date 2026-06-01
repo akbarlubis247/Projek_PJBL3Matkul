@@ -95,6 +95,23 @@ class ReportApiController extends BaseApiController
         $array = json_decode(json_encode($report), true);
         $array['id'] = $array['_id']['$oid'] ?? $id;
 
+        // Dapatkan foto profil terkini milik pelapor
+        $reporterId = $array['reporter_id'] ?? null;
+        if ($reporterId) {
+            $user = $this->db()->selectCollection('users')->findOne([
+                '$or' => [
+                    ['username' => $reporterId],
+                    ['nim' => $reporterId],
+                    ['identifier' => $reporterId],
+                ],
+                'role' => 'civitas',
+                'status' => ['$in' => ['Aktif', 'aktif']],
+            ]);
+            $array['reporter_photo'] = $user['profile_photo'] ?? null;
+        } else {
+            $array['reporter_photo'] = null;
+        }
+
         return $array;
     }
 

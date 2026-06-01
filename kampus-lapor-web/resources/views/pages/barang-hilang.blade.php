@@ -43,16 +43,23 @@
                 <td>{{ $item['lokasi'] }}</td>
                 <td>{{ \Carbon\Carbon::parse($item['tanggal'])->isoFormat('D MMM YYYY') }}</td>
                 <td><span class="badge badge-{{ strtolower($item['status']) }}">{{ $item['status'] }}</span></td>
-                <td style="text-align:right;">
-                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                  <form method="POST" action="{{ route('barang-hilang.ubah-status', $item['id']) }}" style="display:inline;">
-                    @csrf @method('PATCH')
-                    <button type="submit" class="btn-icon-sm btn-icon-green" title="Tandai Barang Ditemukan">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <td style="text-align:right; vertical-align:middle;">
+                  <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:0.25rem;">
+                    <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
-                  </form>
+                    @if(!empty($item['pelapor_nim']))
+                    <a href="{{ route('pesan') }}?nim={{ $item['pelapor_nim'] }}" class="btn-icon-sm btn-icon-blue" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;" title="Chat Pelapor">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </a>
+                    @endif
+                    <form method="POST" action="{{ route('barang-hilang.ubah-status', $item['id']) }}" style="display:inline;">
+                      @csrf @method('PATCH')
+                      <button type="submit" class="btn-icon-sm btn-icon-green" style="display:inline-flex;align-items:center;justify-content:center;" title="Tandai Barang Ditemukan">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
               @endforeach
@@ -82,24 +89,31 @@
                 <td>{{ $item['lokasi'] }}</td>
                 <td>{{ \Carbon\Carbon::parse($item['tanggal'])->isoFormat('D MMM YYYY') }}</td>
                 <td><span class="badge badge-ditemukan">{{ $item['status'] }}</span></td>
-                <td style="text-align:right;">
-                  <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                  </button>
-                  @if(($item['status'] ?? '') === 'Menunggu Diambil')
-                  <form method="POST" action="{{ route('barang-ditemukan.diambil', $item['id']) }}" style="display:inline;">
-                    @csrf @method('PATCH')
-                    <button type="submit" class="btn-icon-sm btn-icon-green" title="Verifikasi Sudah Diambil">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                <td style="text-align:right; vertical-align:middle;">
+                  <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:0.25rem;">
+                    <button class="btn-icon-sm btn-icon-blue" onclick='showDetail({{ json_encode(["Nama Barang"=>$item["namaBarang"],"Pelapor"=>$item["pelapor"],"Lokasi"=>$item["lokasi"],"Tanggal"=>$item["tanggal"],"Status"=>$item["status"],"Deskripsi"=>$item["deskripsi"],"FotoUrl"=>$item["foto"] ?? null]) }})' title="Detail">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
-                  </form>
-                  @endif
-                  <form method="POST" action="{{ route('barang-ditemukan.hapus', $item['id']) }}" style="display:inline;" onsubmit="return confirm('Hapus laporan barang ditemukan {{ $item['namaBarang'] }}? Status di mobile akan menjadi Barang Dihapus.')">
-                    @csrf @method('DELETE')
-                    <button type="submit" class="btn-icon-sm btn-icon-red" title="Hapus Laporan">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-                    </button>
-                  </form>
+                    @if(!empty($item['pelapor_nim']))
+                    <a href="{{ route('pesan') }}?nim={{ $item['pelapor_nim'] }}" class="btn-icon-sm btn-icon-blue" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;" title="Chat Pelapor">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </a>
+                    @endif
+                    @if(($item['status'] ?? '') === 'Menunggu Diambil')
+                    <form method="POST" action="{{ route('barang-ditemukan.diambil', $item['id']) }}" style="display:inline;">
+                      @csrf @method('PATCH')
+                      <button type="submit" class="btn-icon-sm btn-icon-green" style="display:inline-flex;align-items:center;justify-content:center;" title="Verifikasi Sudah Diambil">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                      </button>
+                    </form>
+                    @endif
+                    <form method="POST" action="{{ route('barang-ditemukan.hapus', $item['id']) }}" style="display:inline;" onsubmit="return confirm('Hapus laporan barang ditemukan {{ $item['namaBarang'] }}? Status di mobile akan menjadi Barang Dihapus.')">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="btn-icon-sm btn-icon-red" style="display:inline-flex;align-items:center;justify-content:center;" title="Hapus Laporan">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                      </button>
+                    </form>
+                  </div>
                 </td>
               </tr>
               @endforeach

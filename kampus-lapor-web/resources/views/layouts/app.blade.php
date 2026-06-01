@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Kampus Lapor - {{ $title ?? 'Dashboard' }}</title>
+  <title>Campus Lapor - {{ $title ?? 'Dashboard' }}</title>
   <link rel="icon" type="image/png" href="{{ asset('images/logo_kampus_lapor_square.png') }}">
   <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,7 +14,7 @@
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
-      <img class="sidebar-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Kampus Lapor">
+      <img class="sidebar-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Campus Lapor">
     </div>
 
     <div class="sidebar-section">
@@ -78,16 +78,6 @@
         <span class="topbar-title">{{ $title ?? 'Dashboard' }}</span>
       </div>
       <div class="topbar-right">
-        <div class="search-wrap">
-          <input type="search" id="topbarSearch" placeholder="Cari..." oninput="handleTopbarSearch(this.value)" />
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </div>
-        <a class="btn-icon notif-link" href="{{ $isSuperadminArea ? route('superadmin.seleksi-admin') : route('pesan') }}" title="Buka halaman pesan">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-          @if(!$isSuperadminArea && ($adminUnreadChatCount ?? 0) > 0)
-            <span class="notif-count">{{ $adminUnreadChatCount }}</span>
-          @endif
-        </a>
         <div class="topbar-avatar" title="{{ $isSuperadminArea ? 'Superadmin' : 'Admin Kampus' }}">{{ $isSuperadminArea ? 'SA' : 'AD' }}</div>
       </div>
     </header>

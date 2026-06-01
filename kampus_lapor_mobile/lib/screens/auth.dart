@@ -4,22 +4,22 @@ class MobileLoginPage extends StatefulWidget {
   const MobileLoginPage({
     super.key,
     required this.onLogin,
-    required this.apiBases,
+    required this.apiService,
   });
 
   final void Function(Map<String, dynamic> user) onLogin;
-  final List<String> apiBases;
+  final ApiService apiService;
 
   @override
   State<MobileLoginPage> createState() => _MobileLoginPageState();
 }
 
 class _MobileLoginPageState extends State<MobileLoginPage> {
-  final _name = TextEditingController(text: 'Mahasiswa UPI 1');
-  final _nim = TextEditingController(text: 'UPI-0001');
-  final _username = TextEditingController(text: 'civitas1');
-  final _email = TextEditingController(text: 'mahasiswa1@upi.edu');
-  final _password = TextEditingController(text: 'civitas123');
+  final _name = TextEditingController();
+  final _nim = TextEditingController();
+  final _username = TextEditingController();
+  final _email = TextEditingController();
+  final _password = TextEditingController();
   bool _registerMode = false;
   bool _loading = false;
   String? _error;
@@ -54,20 +54,11 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
                       borderRadius: BorderRadius.circular(18),
                       child: Image.asset(
                         'assets/images/logo_kampus_lapor.png',
-                        width: 168,
+                        width: 240,
                         fit: BoxFit.contain,
                       ),
                     ),
-                    const SizedBox(height: 28),
-                    const Text(
-                      'Kampus Lapor',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 18),
                     const Text(
                       'Laporkan barang hilang, fasilitas rusak, dan chat dengan admin kampus.',
                       style: TextStyle(color: Color(0xFFEDE9FE), height: 1.35),
@@ -223,7 +214,7 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
         } else
           'username': _username.text.trim(),
       };
-      final response = await _postMobileAuth(body);
+      final response = await widget.apiService.postAuth(body, _registerMode);
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       if (response.statusCode >= 400) {
         setState(
@@ -249,27 +240,6 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
     } finally {
       if (mounted) setState(() => _loading = false);
     }
-  }
-
-  Future<http.Response> _postMobileAuth(Map<String, String> body) async {
-    Object? lastError;
-    for (final base in widget.apiBases) {
-      try {
-        return await http
-            .post(
-              Uri.parse(
-                '$base/api/${_registerMode ? 'civitas/register' : 'auth/login/civitas'}',
-              ),
-              headers: {'Accept': 'application/json'},
-              body: body,
-            )
-            .timeout(const Duration(seconds: 4));
-      } catch (error) {
-        lastError = error;
-      }
-    }
-
-    throw lastError ?? Exception('Server tidak dapat dihubungi');
   }
 }
 

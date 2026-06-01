@@ -5,7 +5,7 @@
 <div class="page-top">
   <div>
     <h2>Data Kampus</h2>
-    <p class="page-desc">Koleksi kampus yang sudah terhubung dengan admin aktif Kampus Lapor.</p>
+    <p class="page-desc">Koleksi kampus yang sudah terhubung dengan admin aktif Campus Lapor.</p>
   </div>
 </div>
 

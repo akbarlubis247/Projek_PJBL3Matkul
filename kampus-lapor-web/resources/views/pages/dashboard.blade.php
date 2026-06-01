@@ -41,27 +41,9 @@
 <div class="dashboard-grid">
   <div class="card">
     <div class="card-header"><h3>Tren Laporan</h3><p>Statistik 6 bulan terakhir</p></div>
-    <div class="card-body">
-      @php
-        $maxVal = collect($chartData)->max(fn($d)=>max($d['barangHilang'],$d['fasilitasRusak']));
-      @endphp
-      <div class="chart-bars">
-        @foreach($chartData as $d)
-          @php $h1=$maxVal > 0 ? ($d['barangHilang']/$maxVal)*180 : 0; $h2=$maxVal > 0 ? ($d['fasilitasRusak']/$maxVal)*180 : 0; @endphp
-          <div class="chart-group">
-            <div class="bar bar-green" style="height:{{ $h1 }}px;flex:1;" title="Barang Hilang: {{ $d['barangHilang'] }}"></div>
-            <div class="bar bar-amber" style="height:{{ $h2 }}px;flex:1;" title="Fasilitas Rusak: {{ $d['fasilitasRusak'] }}"></div>
-          </div>
-        @endforeach
-      </div>
-      <div class="chart-labels">
-        @foreach($chartData as $d)
-          <div class="chart-label">{{ $d['month'] }}</div>
-        @endforeach
-      </div>
-      <div class="chart-legend">
-        <div class="chart-legend-item"><div class="legend-dot" style="background:#7c3aed;"></div> Brg Hilang</div>
-        <div class="chart-legend-item"><div class="legend-dot" style="background:#f59e0b;"></div> Fasilitas Rusak</div>
+    <div class="card-body" style="padding: 1.25rem 1.5rem;">
+      <div style="position: relative; height: 230px; width: 100%;">
+        <canvas id="trendsChart"></canvas>
       </div>
     </div>
   </div>
@@ -91,4 +73,107 @@
   </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const ctx = document.getElementById('trendsChart').getContext('2d');
+    
+    fetch('{{ route("dashboard.trends-data") }}')
+        .then(response => response.json())
+        .then(data => {
+            const labels = data.map(item => item.month);
+            const barangHilangData = data.map(item => item.barangHilang);
+            const fasilitasRusakData = data.map(item => item.fasilitasRusak);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Barang Hilang',
+                            data: barangHilangData,
+                            backgroundColor: 'rgba(124, 58, 237, 0.85)',
+                            borderColor: '#7c3aed',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        },
+                        {
+                            label: 'Fasilitas Rusak',
+                            data: fasilitasRusakData,
+                            backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                            borderColor: '#f59e0b',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            borderSkipped: false,
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                font: {
+                                    family: "'Inter', sans-serif",
+                                    size: 11,
+                                    weight: '500'
+                                },
+                                color: '#64748b',
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                padding: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { family: "'Inter', sans-serif", size: 12, weight: '600' },
+                            bodyFont: { family: "'Inter', sans-serif", size: 12 },
+                            padding: 10,
+                            borderRadius: 8,
+                            boxPadding: 6
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: { family: "'Inter', sans-serif", size: 10, weight: '500' },
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: '#f1f5f9',
+                                drawTicks: false
+                            },
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 1,
+                                font: { family: "'Inter', sans-serif", size: 10 },
+                                color: '#64748b'
+                            },
+                            border: {
+                                dash: [4, 4],
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(err => {
+            console.error('Gagal mengambil data tren:', err);
+        });
+});
+</script>
+@endpush
 

@@ -25,9 +25,9 @@
             display: table;
             width: 100%;
             padding: 18px 20px;
-            border: 1px solid #fed7aa;
+            border: 1px solid #ddd6fe;
             border-radius: 14px;
-            background: #fff7ed;
+            background: #f5f3ff;
         }
 
         .logo,
@@ -91,7 +91,7 @@
 
         .stat-value {
             margin-top: 4px;
-            color: #ea580c;
+            color: #7c3aed;
             font-size: 20px;
             font-weight: 800;
         }
@@ -112,7 +112,7 @@
         th {
             padding: 10px 8px;
             color: #ffffff;
-            background: #f97316;
+            background: #7c3aed;
             font-size: 10px;
             letter-spacing: .02em;
             text-align: left;
@@ -126,15 +126,15 @@
         }
 
         tbody tr:nth-child(even) td {
-            background: #fff7ed;
+            background: #f5f3ff;
         }
 
         .status {
             display: inline-block;
             padding: 4px 8px;
             border-radius: 999px;
-            color: #9a3412;
-            background: #ffedd5;
+            color: #6d28d9;
+            background: #f3e8ff;
             font-weight: 700;
             white-space: nowrap;
         }

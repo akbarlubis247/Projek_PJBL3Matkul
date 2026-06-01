@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureRole::class,
+            'auth.api' => \App\Http\Middleware\AuthenticateApiToken::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             'mobile/register',

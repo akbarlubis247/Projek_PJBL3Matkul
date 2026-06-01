@@ -1,67 +1,5 @@
 part of '../main.dart';
 
-class _FilterDropdown extends StatelessWidget {
-  const _FilterDropdown({
-    required this.value,
-    required this.values,
-    required this.icon,
-    required this.onChanged,
-  });
-
-  final String value;
-  final List<String> values;
-  final IconData icon;
-  final ValueChanged<String> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final safeValues = values.isEmpty ? ['Semua'] : values;
-    final safeValue = safeValues.contains(value) ? value : safeValues.first;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE9D5FF)),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF7C3AED).withValues(alpha: .06),
-            blurRadius: 14,
-            offset: const Offset(0, 7),
-          ),
-        ],
-      ),
-      child: DropdownButtonFormField<String>(
-        initialValue: safeValue,
-        icon: const Icon(Icons.keyboard_arrow_down_rounded),
-        decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: const Color(0xFF7C3AED), size: 19),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 14,
-          ),
-        ),
-        dropdownColor: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        style: const TextStyle(
-          color: Color(0xFF2B2438),
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-        items: safeValues
-            .map(
-              (item) => DropdownMenuItem(
-                value: item,
-                child: Text(item, overflow: TextOverflow.ellipsis),
-              ),
-            )
-            .toList(),
-        onChanged: (value) => onChanged(value ?? safeValue),
-      ),
-    );
-  }
-}
 
 class _ModernFormDropdown extends StatelessWidget {
   const _ModernFormDropdown({
@@ -97,6 +35,7 @@ class _ModernFormDropdown extends StatelessWidget {
         ],
       ),
       child: DropdownButtonFormField<String>(
+        isExpanded: true,
         initialValue: safeValue,
         icon: const Icon(
           Icons.keyboard_arrow_down_rounded,

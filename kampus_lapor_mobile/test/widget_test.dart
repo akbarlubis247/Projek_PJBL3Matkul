@@ -5,7 +5,7 @@ void main() {
   testWidgets('renders civitas login page', (tester) async {
     await tester.pumpWidget(const KampusLaporApp());
 
-    expect(find.text('Kampus Lapor'), findsOneWidget);
+    expect(find.text('Campus Lapor'), findsOneWidget);
     expect(find.text('Masuk'), findsOneWidget);
     expect(find.text('Username / NIM'), findsOneWidget);
   });

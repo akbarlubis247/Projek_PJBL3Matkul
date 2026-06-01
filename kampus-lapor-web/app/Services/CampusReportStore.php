@@ -58,7 +58,34 @@ class CampusReportStore
             ->find(['campus_key' => $campusKey], ['sort' => ['created_at' => -1]])
             ->toArray();
 
-        return array_map(fn ($item) => $this->normalize($item), $items);
+        // Eager load reporter profile photos in ONE single batch query!
+        $reporterIds = array_values(array_filter(array_unique(array_column($items, 'reporter_id'))));
+        $usersMap = [];
+        if (!empty($reporterIds)) {
+            $users = $this->users->find([
+                '$or' => [
+                    ['username' => ['$in' => $reporterIds]],
+                    ['nim' => ['$in' => $reporterIds]],
+                    ['identifier' => ['$in' => $reporterIds]],
+                ],
+                'role' => 'civitas',
+                'status' => ['$in' => ['Aktif', 'aktif']],
+            ])->toArray();
+            foreach ($users as $u) {
+                $uArr = json_decode(json_encode($u), true);
+                $photo = $uArr['profile_photo'] ?? null;
+                if ($uArr['username'] ?? null) $usersMap[$uArr['username']] = $photo;
+                if ($uArr['nim'] ?? null) $usersMap[$uArr['nim']] = $photo;
+                if ($uArr['identifier'] ?? null) $usersMap[$uArr['identifier']] = $photo;
+            }
+        }
+
+        return array_map(function ($item) use ($usersMap) {
+            $array = $this->normalize($item);
+            $reporterId = $array['reporter_id'] ?? null;
+            $array['reporter_photo'] = ($reporterId && isset($usersMap[$reporterId])) ? $usersMap[$reporterId] : null;
+            return $array;
+        }, $items);
     }
 
     public function forReporter(string $reporterId): array
@@ -67,7 +94,33 @@ class CampusReportStore
             ->find(['reporter_id' => $reporterId], ['sort' => ['created_at' => -1]])
             ->toArray();
 
-        return array_map(fn ($item) => $this->normalize($item), $items);
+        // Eager load reporter profile photo in ONE single query!
+        $usersMap = [];
+        if ($reporterId) {
+            $user = $this->users->findOne([
+                '$or' => [
+                    ['username' => $reporterId],
+                    ['nim' => $reporterId],
+                    ['identifier' => $reporterId],
+                ],
+                'role' => 'civitas',
+                'status' => ['$in' => ['Aktif', 'aktif']],
+            ]);
+            if ($user) {
+                $uArr = json_decode(json_encode($user), true);
+                $photo = $uArr['profile_photo'] ?? null;
+                if ($uArr['username'] ?? null) $usersMap[$uArr['username']] = $photo;
+                if ($uArr['nim'] ?? null) $usersMap[$uArr['nim']] = $photo;
+                if ($uArr['identifier'] ?? null) $usersMap[$uArr['identifier']] = $photo;
+            }
+        }
+
+        return array_map(function ($item) use ($usersMap) {
+            $array = $this->normalize($item);
+            $reporterId = $array['reporter_id'] ?? null;
+            $array['reporter_photo'] = ($reporterId && isset($usersMap[$reporterId])) ? $usersMap[$reporterId] : null;
+            return $array;
+        }, $items);
     }
 
     public function updateStatus(string $campusKey, string $id, string $status): bool

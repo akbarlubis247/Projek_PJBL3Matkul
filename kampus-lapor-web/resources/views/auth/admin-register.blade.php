@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>Daftar Admin Kampus - Kampus Lapor</title>
+  <title>Daftar Admin Kampus - Campus Lapor</title>
   <link rel="icon" type="image/png" href="{{ asset('images/logo_kampus_lapor_square.png') }}">
   <link rel="stylesheet" href="{{ asset('css/app.css') }}" />
 </head>
@@ -13,7 +13,7 @@
     <section class="login-panel register-panel">
       <div class="login-brand">
         <div class="login-brand-logo-wrap">
-          <img class="login-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Kampus Lapor">
+          <img class="login-brand-logo" src="{{ asset('images/logo_kampus_lapor.png') }}" alt="Campus Lapor">
         </div>
         <div>
           <h1>Daftar Admin Kampus</h1>

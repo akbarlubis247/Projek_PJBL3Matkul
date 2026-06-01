@@ -142,6 +142,7 @@ class _CreateReportPageState extends State<_CreateReportPage> {
         description: _description.text.trim(),
         reporter: 'Civitas Mobile 1',
         photoBytes: _photoBytes,
+        reporterId: null,
       ),
     );
 
