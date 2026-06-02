@@ -5,8 +5,38 @@
 <div class="toolbar">
   <p class="page-desc">Kelola laporan kerusakan dan perbaikan fasilitas kampus.</p>
   <div style="display:flex;align-items:center;gap:.75rem;">
-    <a href="{{ route('fasilitas-rusak.export', 'pdf') }}" class="btn btn-pdf">PDF</a>
-    <a href="{{ route('fasilitas-rusak.export', 'excel') }}" class="btn btn-excel">Excel</a>
+    <div class="export-dropdown" id="exportDropdownFasilitas">
+      <button type="button" class="btn btn-primary" onclick="toggleExportDropdown('exportDropdownFasilitas')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Laporan
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="export-dropdown-menu">
+        <div class="export-dropdown-label">Fasilitas Rusak</div>
+        <a href="{{ route('fasilitas-rusak.export-rusak', 'pdf') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-pdf">PDF</span> Fasilitas Rusak
+        </a>
+        <a href="{{ route('fasilitas-rusak.export-rusak', 'excel') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-excel">XLS</span> Fasilitas Rusak
+        </a>
+        <div class="export-dropdown-divider"></div>
+        <div class="export-dropdown-label">Sudah Diperbaiki</div>
+        <a href="{{ route('fasilitas-rusak.export', 'pdf') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-pdf">PDF</span> Sudah Diperbaiki
+        </a>
+        <a href="{{ route('fasilitas-rusak.export', 'excel') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-excel">XLS</span> Sudah Diperbaiki
+        </a>
+        <div class="export-dropdown-divider"></div>
+        <div class="export-dropdown-label">Semua Laporan</div>
+        <a href="{{ route('fasilitas-rusak.export-semua', 'pdf') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-pdf">PDF</span> Semua Fasilitas
+        </a>
+        <a href="{{ route('fasilitas-rusak.export-semua', 'excel') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-excel">XLS</span> Semua Fasilitas
+        </a>
+      </div>
+    </div>
     <div class="search-input-wrap" style="width:260px;">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="search" id="searchFasilitas" placeholder="Cari fasilitas atau lokasi..." oninput="filterTable('searchFasilitas','tableRusak','tableDiperbaiki')" />

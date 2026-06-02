@@ -82,7 +82,7 @@ class DataLaporanSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSi
 
         return [
             1 => [
-                'font' => ['bold' => true, 'size' => 18, 'color' => ['rgb' => 'EA580C']],
+                'font' => ['bold' => true, 'size' => 18, 'color' => ['rgb' => '7C3AED']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
             2 => [
@@ -93,7 +93,7 @@ class DataLaporanSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSi
             4 => ['font' => ['bold' => true]],
             self::TABLE_START_ROW - 1 => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F97316']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '7C3AED']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
         ];
@@ -112,8 +112,8 @@ class DataLaporanSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSi
                 $sheet->setAutoFilter("A{$tableHeaderRow}:{$highestColumn}{$highestRow}");
 
                 $sheet->getStyle("A3:H4")->applyFromArray([
-                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FFF7ED']],
-                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'FED7AA']]],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F5F3FF']],
+                    'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'DDD6FE']]],
                 ]);
 
                 $sheet->getStyle("A{$tableHeaderRow}:{$highestColumn}{$highestRow}")->applyFromArray([
@@ -127,7 +127,7 @@ class DataLaporanSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSi
                             ->getFill()
                             ->setFillType(Fill::FILL_SOLID)
                             ->getStartColor()
-                            ->setRGB('FFF7ED');
+                            ->setRGB('F5F3FF');
                     }
                 }
             },
@@ -167,12 +167,12 @@ class StatistikSheet implements FromArray, WithTitle, WithStyles, ShouldAutoSize
 
         return [
             1 => [
-                'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => 'EA580C']],
+                'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '7C3AED']],
                 'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
             ],
             3 => [
                 'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
-                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'F97316']],
+                'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '7C3AED']],
             ],
             'A3:B9' => [
                 'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'E2E8F0']]],

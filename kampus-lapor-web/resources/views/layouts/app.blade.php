@@ -135,6 +135,23 @@
   </div>
 </div>
 
+<!-- Modal Export Loading -->
+<div class="modal-backdrop" id="modalExportLoading" style="display:none;">
+  <div class="modal-box" style="max-width:400px;text-align:center;">
+    <div class="export-loading-spinner">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <circle cx="24" cy="24" r="20" stroke="#e2e8f0" stroke-width="4"/>
+        <circle cx="24" cy="24" r="20" stroke="#7c3aed" stroke-width="4" stroke-linecap="round" stroke-dasharray="80 126" class="export-spinner-arc"/>
+      </svg>
+    </div>
+    <h2 class="modal-title" style="margin-top:1rem;">Mengunduh Laporan</h2>
+    <p style="color:var(--muted);font-size:.875rem;margin-bottom:.5rem;">Sedang memproses file, harap tunggu...</p>
+    <div class="export-loading-bar">
+      <div class="export-loading-bar-fill"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 function toggleSidebar() {
   const sb = document.getElementById('sidebar');
@@ -209,6 +226,40 @@ function handleTopbarSearch(value) {
   if (typeof window.onTopbarSearch === 'function') {
     window.onTopbarSearch(value);
   }
+}
+
+// Export Dropdown
+function toggleExportDropdown(id) {
+  const dropdown = document.getElementById(id);
+  const isOpen = dropdown.classList.contains('open');
+  // Close all dropdowns first
+  document.querySelectorAll('.export-dropdown.open').forEach(el => el.classList.remove('open'));
+  if (!isOpen) dropdown.classList.add('open');
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.export-dropdown')) {
+    document.querySelectorAll('.export-dropdown.open').forEach(el => el.classList.remove('open'));
+  }
+});
+
+// Export Loading Modal
+function showExportLoading(e) {
+  // Close dropdown
+  document.querySelectorAll('.export-dropdown.open').forEach(el => el.classList.remove('open'));
+  // Show loading modal
+  const modal = document.getElementById('modalExportLoading');
+  modal.style.display = 'flex';
+  // Reset progress bar animation
+  const bar = modal.querySelector('.export-loading-bar-fill');
+  bar.style.animation = 'none';
+  bar.offsetHeight; // trigger reflow
+  bar.style.animation = '';
+  // Auto-hide after 8 seconds (file download doesn't fire JS events)
+  setTimeout(() => {
+    modal.style.display = 'none';
+  }, 8000);
 }
 </script>
 @stack('scripts')

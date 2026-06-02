@@ -25,11 +25,15 @@ Route::middleware(['role:admin'])->group(function () {
     // Manajemen Laporan & Barang
     Route::get('/barang-hilang', [ReportController::class, 'barangHilang'])->name('barang-hilang');
     Route::get('/barang-hilang/export/{format}', [ReportController::class, 'exportBarang'])->name('barang-hilang.export');
+    Route::get('/barang-hilang/export-hilang/{format}', [ReportController::class, 'exportBarangHilang'])->name('barang-hilang.export-hilang');
+    Route::get('/barang-hilang/export-semua/{format}', [ReportController::class, 'exportBarangSemua'])->name('barang-hilang.export-semua');
     Route::patch('/barang-hilang/{id}/ubah-status', [ReportController::class, 'ubahStatusBarang'])->name('barang-hilang.ubah-status');
     Route::patch('/barang-ditemukan/{id}/diambil', [ReportController::class, 'tandaiBarangDiambil'])->name('barang-ditemukan.diambil');
     Route::delete('/barang-ditemukan/{id}', [ReportController::class, 'hapusBarangDitemukan'])->name('barang-ditemukan.hapus');
     Route::get('/fasilitas-rusak', [ReportController::class, 'fasilitasRusak'])->name('fasilitas-rusak');
     Route::get('/fasilitas-rusak/export/{format}', [ReportController::class, 'exportFasilitas'])->name('fasilitas-rusak.export');
+    Route::get('/fasilitas-rusak/export-rusak/{format}', [ReportController::class, 'exportFasilitasRusak'])->name('fasilitas-rusak.export-rusak');
+    Route::get('/fasilitas-rusak/export-semua/{format}', [ReportController::class, 'exportFasilitasSemua'])->name('fasilitas-rusak.export-semua');
     Route::patch('/fasilitas-rusak/{id}/tandai', [ReportController::class, 'tandaiDiperbaiki'])->name('fasilitas-rusak.tandai');
     Route::delete('/fasilitas-diperbaiki/{id}', [ReportController::class, 'hapusFasilitasDiperbaiki'])->name('fasilitas-diperbaiki.hapus');
     

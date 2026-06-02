@@ -1,8 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/syabib/flutter"
-export "FLUTTER_APPLICATION_PATH=/Users/syabib/Herd/Projek_PJBL3Matkul/kampus_lapor_mobile"
-export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=/Users/syabib/Herd/Projek_PJBL3Matkul/kampus_lapor_mobile/macos/Flutter/ephemeral/Packages/.packages/FlutterFramework"
+export "FLUTTER_ROOT=D:\src\flutter"
+export "FLUTTER_APPLICATION_PATH=D:\Learn_IPB\Semester 4\Project3Matkul_AwanxMobilexWeb\Projek_PJBL3Matkul\kampus_lapor_mobile"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=D:\Learn_IPB\Semester 4\Project3Matkul_AwanxMobilexWeb\Projek_PJBL3Matkul\kampus_lapor_mobile\macos\Flutter\ephemeral\Packages\.packages\FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"

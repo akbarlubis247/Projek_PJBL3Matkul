@@ -168,7 +168,32 @@ class ReportController extends Controller
             ->map(fn ($item, $i) => $this->exportRow($item, $i, 'Barang Hilang', 'namaBarang'))
             ->all();
 
-        return $this->downloadReport($format, 'laporan-barang-ditemukan', 'Laporan Barang Hilang yang Sudah Dikonfirmasi', $rows);
+        return $this->downloadReport($format, 'laporan-barang-ditemukan', 'Laporan Barang Ditemukan', $rows);
+    }
+
+    public function exportBarangHilang(string $format, CampusReportStore $reports)
+    {
+        $rows = collect($this->pendingBarangRows($reports))
+            ->values()
+            ->map(fn ($item, $i) => $this->exportRow($item, $i, 'Barang Hilang', 'namaBarang'))
+            ->all();
+
+        return $this->downloadReport($format, 'laporan-barang-hilang', 'Laporan Barang Hilang', $rows);
+    }
+
+    public function exportBarangSemua(string $format, CampusReportStore $reports)
+    {
+        $hilang = collect($this->pendingBarangRows($reports))
+            ->values()
+            ->map(fn ($item, $i) => $this->exportRow($item, $i, 'Barang Hilang', 'namaBarang'))
+            ->all();
+        $ditemukan = collect($this->approvedBarangRows($reports))
+            ->values()
+            ->map(fn ($item, $i) => $this->exportRow($item, $i + count($hilang), 'Barang Hilang', 'namaBarang'))
+            ->all();
+        $rows = array_merge($hilang, $ditemukan);
+
+        return $this->downloadReport($format, 'laporan-semua-barang', 'Laporan Semua Barang (Hilang & Ditemukan)', $rows);
     }
 
     public function exportFasilitas(string $format, CampusReportStore $reports)
@@ -178,7 +203,46 @@ class ReportController extends Controller
             ->map(fn ($item, $i) => $this->exportRow($item, $i, 'Fasilitas Rusak', 'namaFasilitas'))
             ->all();
 
-        return $this->downloadReport($format, 'laporan-fasilitas-diperbaiki', 'Laporan Fasilitas Rusak yang Sudah Dikonfirmasi', $rows);
+        return $this->downloadReport($format, 'laporan-fasilitas-diperbaiki', 'Laporan Fasilitas Sudah Diperbaiki', $rows);
+    }
+
+    public function exportFasilitasRusak(string $format, CampusReportStore $reports)
+    {
+        $rows = collect($this->pendingFasilitasRows($reports))
+            ->values()
+            ->map(fn ($item, $i) => $this->exportRow($item, $i, 'Fasilitas Rusak', 'namaFasilitas'))
+            ->all();
+
+        return $this->downloadReport($format, 'laporan-fasilitas-rusak', 'Laporan Fasilitas Rusak', $rows);
+    }
+
+    public function exportFasilitasSemua(string $format, CampusReportStore $reports)
+    {
+        $rusak = collect($this->pendingFasilitasRows($reports))
+            ->values()
+            ->map(fn ($item, $i) => $this->exportRow($item, $i, 'Fasilitas Rusak', 'namaFasilitas'))
+            ->all();
+        $diperbaiki = collect($this->approvedFasilitasRows($reports))
+            ->values()
+            ->map(fn ($item, $i) => $this->exportRow($item, $i + count($rusak), 'Fasilitas Rusak', 'namaFasilitas'))
+            ->all();
+        $rows = array_merge($rusak, $diperbaiki);
+
+        return $this->downloadReport($format, 'laporan-semua-fasilitas', 'Laporan Semua Fasilitas (Rusak & Diperbaiki)', $rows);
+    }
+
+    private function pendingBarangRows(CampusReportStore $reports): array
+    {
+        $d = $this->dashboardData();
+        $campusReports = collect($this->campusReports($reports));
+
+        return collect($d['barangHilang'])
+            ->concat($campusReports
+                ->where('kategori', 'Barang Hilang')
+                ->reject(fn ($item) => in_array($item['status'], ['Ditemukan', 'Menunggu Diambil', 'Sudah Diambil', 'Selesai', 'Barang Dihapus'], true))
+                ->values())
+            ->values()
+            ->all();
     }
 
     private function approvedBarangRows(CampusReportStore $reports): array
@@ -190,6 +254,20 @@ class ReportController extends Controller
             ->concat($campusReports
                 ->where('kategori', 'Barang Hilang')
                 ->filter(fn ($item) => in_array($item['status'], ['Ditemukan', 'Menunggu Diambil', 'Sudah Diambil', 'Selesai'], true))
+                ->values())
+            ->values()
+            ->all();
+    }
+
+    private function pendingFasilitasRows(CampusReportStore $reports): array
+    {
+        $d = $this->dashboardData();
+        $campusReports = collect($this->campusReports($reports));
+
+        return collect($d['fasilitasRusak'])
+            ->concat($campusReports
+                ->where('kategori', 'Fasilitas Rusak')
+                ->reject(fn ($item) => in_array($item['status'], ['Sudah Diperbaiki', 'Selesai'], true))
                 ->values())
             ->values()
             ->all();

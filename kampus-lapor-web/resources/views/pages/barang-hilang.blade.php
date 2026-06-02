@@ -5,8 +5,38 @@
 <div class="toolbar">
   <p class="page-desc">Kelola laporan barang hilang dan ditemukan di area kampus.</p>
   <div style="display:flex;align-items:center;gap:.75rem;">
-    <a href="{{ route('barang-hilang.export', 'pdf') }}" class="btn btn-pdf">PDF</a>
-    <a href="{{ route('barang-hilang.export', 'excel') }}" class="btn btn-excel">Excel</a>
+    <div class="export-dropdown" id="exportDropdownBarang">
+      <button type="button" class="btn btn-primary" onclick="toggleExportDropdown('exportDropdownBarang')">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Laporan
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="export-dropdown-menu">
+        <div class="export-dropdown-label">Barang Hilang</div>
+        <a href="{{ route('barang-hilang.export-hilang', 'pdf') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-pdf">PDF</span> Barang Hilang
+        </a>
+        <a href="{{ route('barang-hilang.export-hilang', 'excel') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-excel">XLS</span> Barang Hilang
+        </a>
+        <div class="export-dropdown-divider"></div>
+        <div class="export-dropdown-label">Barang Ditemukan</div>
+        <a href="{{ route('barang-hilang.export', 'pdf') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-pdf">PDF</span> Barang Ditemukan
+        </a>
+        <a href="{{ route('barang-hilang.export', 'excel') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-excel">XLS</span> Barang Ditemukan
+        </a>
+        <div class="export-dropdown-divider"></div>
+        <div class="export-dropdown-label">Semua Laporan</div>
+        <a href="{{ route('barang-hilang.export-semua', 'pdf') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-pdf">PDF</span> Semua Barang
+        </a>
+        <a href="{{ route('barang-hilang.export-semua', 'excel') }}" class="export-dropdown-item" onclick="showExportLoading(event)">
+          <span class="export-icon export-icon-excel">XLS</span> Semua Barang
+        </a>
+      </div>
+    </div>
     <div class="search-input-wrap" style="width:260px;">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="search" id="searchBarang" placeholder="Cari barang atau pelapor..." oninput="filterTable('searchBarang','tableHilang','tableFound')" />
