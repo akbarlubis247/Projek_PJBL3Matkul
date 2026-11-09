@@ -5,10 +5,12 @@ class MobileLoginPage extends StatefulWidget {
     super.key,
     required this.onLogin,
     required this.apiService,
+    this.initialRegisterMode = false,
   });
 
   final void Function(Map<String, dynamic> user) onLogin;
   final ApiService apiService;
+  final bool initialRegisterMode;
 
   @override
   State<MobileLoginPage> createState() => _MobileLoginPageState();
@@ -20,7 +22,7 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
   final _username = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
-  bool _registerMode = false;
+  late bool _registerMode = widget.initialRegisterMode;
   bool _loading = false;
   String? _error;
 
@@ -190,10 +192,104 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
                   ],
                 ),
               ),
-              const SizedBox(height: 28),
+              const SizedBox(height: 14),
+              Center(
+                child: TextButton.icon(
+                  onPressed: _showServerDialog,
+                  icon: const Icon(Icons.dns_outlined, size: 16, color: Color(0xFF7C3AED)),
+                  label: Text(
+                    'Server: ${_serverLabel(widget.apiService.activeBase)}',
+                    style: const TextStyle(
+                      color: Color(0xFF7C3AED),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  String _serverLabel(String url) {
+    if (url.contains('railway.app')) return 'Cloud Railway (Aktif)';
+    if (url.contains('192.168.')) return 'Wi-Fi Lokal (${url.replaceAll("http://", "")})';
+    if (url.contains('10.0.2.2')) return 'Emulator Android';
+    if (url.contains('127.0.0.1') || url.contains('localhost')) return 'Localhost';
+    return url.isEmpty ? 'Default' : url;
+  }
+
+  void _showServerDialog() {
+    final customController = TextEditingController(text: widget.apiService.activeBase);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Pengaturan Server API', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text('Pilih tujuan server backend untuk aplikasi mobile:'),
+            const SizedBox(height: 12),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.cloud_done, color: Color(0xFF7C3AED)),
+              title: const Text('Cloud Railway (Rekomendasi)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              subtitle: const Text('Langsung terhubung ke cloud tanpa perlu server lokal', style: TextStyle(fontSize: 11)),
+              onTap: () {
+                setState(() {
+                  widget.apiService.setBaseUrl('https://web-admincampus-lapor.up.railway.app');
+                });
+                Navigator.pop(ctx);
+              },
+            ),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.wifi, color: Color(0xFF0284C7)),
+              title: const Text('Wi-Fi Lokal Laptop', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+              subtitle: const Text('http://192.168.18.55:8000', style: TextStyle(fontSize: 11)),
+              onTap: () {
+                setState(() {
+                  widget.apiService.setBaseUrl('http://192.168.18.55:8000');
+                });
+                Navigator.pop(ctx);
+              },
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: customController,
+              decoration: const InputDecoration(
+                labelText: 'URL Server Kustom',
+                hintText: 'http://192.168.x.x:8000',
+                isDense: true,
+                border: OutlineInputBorder(),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newUrl = customController.text.trim();
+              if (newUrl.isNotEmpty) {
+                setState(() {
+                  widget.apiService.setBaseUrl(newUrl);
+                });
+              }
+              Navigator.pop(ctx);
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
       ),
     );
   }
@@ -232,10 +328,11 @@ class _MobileLoginPageState extends State<MobileLoginPage> {
         return;
       }
       widget.onLogin(data['user'] as Map<String, dynamic>);
-    } catch (_) {
+    } catch (e) {
+      final activeUrl = widget.apiService.activeBase;
       setState(
         () => _error =
-            'Tidak bisa terhubung ke server Laravel. Pastikan Laravel sedang jalan di port 8000.',
+            'Tidak bisa terhubung ke server ($activeUrl).\nPastikan koneksi internet aktif atau server lokal berjalan.',
       );
     } finally {
       if (mounted) setState(() => _loading = false);

@@ -1,10 +1,19 @@
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  final List<String> apiBases;
+  List<String> apiBases;
   String token = '';
 
   ApiService({required this.apiBases});
+
+  String get activeBase => apiBases.isNotEmpty ? apiBases.first : '';
+
+  void setBaseUrl(String url) {
+    final clean = url.trim().replaceAll(RegExp(r'/+$'), '');
+    if (clean.isNotEmpty) {
+      apiBases = [clean, ...apiBases.where((b) => b != clean)];
+    }
+  }
 
   Future<http.Response> postAuth(Map<String, String> body, bool registerMode) async {
     Object? lastError;
@@ -18,7 +27,7 @@ class ApiService {
               headers: {'Accept': 'application/json'},
               body: body,
             )
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 8));
       } catch (error) {
         lastError = error;
       }
@@ -39,7 +48,7 @@ class ApiService {
               },
               body: body,
             )
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 8));
       } catch (error) {
         lastError = error;
       }
@@ -59,7 +68,7 @@ class ApiService {
                 if (token.isNotEmpty) 'Authorization': 'Bearer $token',
               },
             )
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 8));
       } catch (error) {
         lastError = error;
       }
@@ -80,7 +89,7 @@ class ApiService {
               },
               body: body,
             )
-            .timeout(const Duration(seconds: 4));
+            .timeout(const Duration(seconds: 8));
       } catch (error) {
         lastError = error;
       }
@@ -88,3 +97,4 @@ class ApiService {
     throw lastError ?? Exception('Server tidak dapat dihubungi');
   }
 }
+
