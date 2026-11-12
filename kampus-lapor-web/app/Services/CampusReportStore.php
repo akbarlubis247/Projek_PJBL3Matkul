@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Collection;
 
@@ -54,8 +55,23 @@ class CampusReportStore
 
     public function forCampus(string $campusKey): array
     {
+        $shortKey = trim(explode('/', $campusKey)[0]);
+        $orConditions = [
+            ['campus_key' => $campusKey],
+        ];
+
+        if ($shortKey !== '') {
+            $regex = new Regex('^' . preg_quote($shortKey) . '(\b|\s|/|$)', 'i');
+            $orConditions[] = ['campus_key' => $regex];
+        }
+
+        $sessionCampus = session('auth_kampus');
+        if (!empty($sessionCampus)) {
+            $orConditions[] = ['kampus' => $sessionCampus];
+        }
+
         $items = $this->reports
-            ->find(['campus_key' => $campusKey], ['sort' => ['created_at' => -1]])
+            ->find(['$or' => $orConditions], ['sort' => ['created_at' => -1]])
             ->toArray();
 
         // Eager load reporter profile photos in ONE single batch query!

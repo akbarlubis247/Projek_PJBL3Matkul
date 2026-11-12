@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Str;
+use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Collection;
 
@@ -25,7 +26,11 @@ class ChatStore
         }
 
         if ($campusKey !== null && trim($campusKey) !== '') {
-            $filter['campus_key'] = $campusKey;
+            $shortKey = trim(explode('/', $campusKey)[0]);
+            $filter['$or'] = [
+                ['campus_key' => $campusKey],
+                ['campus_key' => new Regex('^' . preg_quote($shortKey) . '(\b|\s|/|$)', 'i')],
+            ];
         }
 
         return $filter;

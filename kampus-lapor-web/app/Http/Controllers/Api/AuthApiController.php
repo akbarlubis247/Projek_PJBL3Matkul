@@ -25,13 +25,25 @@ class AuthApiController extends BaseApiController
     {
         $data = $request->validate(['username' => 'required|string', 'password' => 'required|string']);
         $user = $this->users()->findOne([
-            'username' => $data['username'],
+            '$or' => [
+                ['username' => $data['username']],
+                ['identifier' => $data['username']],
+                ['nim' => $data['username']],
+            ],
             'role' => 'civitas',
-            'status' => ['$in' => ['Aktif', 'aktif']],
         ]);
 
         if (! $user || ! Hash::check($data['password'], $user['password'] ?? '')) {
             return response()->json(['message' => 'Username atau password tidak sesuai.'], 422);
+        }
+
+        $status = strtolower((string) ($user['status'] ?? 'menunggu'));
+        if ($status === 'menunggu') {
+            return response()->json(['message' => 'Akun menunggu persetujuan admin kampus.'], 403);
+        }
+
+        if ($status === 'banned') {
+            return response()->json(['message' => 'Akun Anda dinonaktifkan/dibanned oleh admin kampus.'], 403);
         }
 
         $payload = $this->publicUser($user);
@@ -82,6 +94,20 @@ class AuthApiController extends BaseApiController
             'email' => 'required|email|max:160',
             'password' => 'required|string|min:6',
         ]);
+
+        $existing = $this->users()->findOne([
+            '$or' => [
+                ['username' => $data['nim']],
+                ['email' => $data['email']],
+                ['identifier' => $data['nim']],
+                ['nim' => $data['nim']],
+            ],
+            'role' => 'civitas',
+        ]);
+
+        if ($existing) {
+            return response()->json(['message' => 'Email atau NIM sudah terdaftar.'], 422);
+        }
 
         $domain = strtolower(substr(strrchr($data['email'], '@') ?: '', 1));
         $admin = $this->findAdminByDomain($domain);
@@ -175,10 +201,31 @@ class AuthApiController extends BaseApiController
 
     private function findAdminByDomain(string $domain): ?array
     {
-        foreach ($this->users()->find(['role' => 'admin', 'status' => 'aktif']) as $admin) {
-            $item = $admin->getArrayCopy();
+        $domain = strtolower(trim($domain));
+        if ($domain === '') {
+            return null;
+        }
+
+        $admins = $this->users()->find(['role' => 'admin', 'status' => 'aktif'])->toArray();
+
+        // 1st priority: look for admin whose kode_kampus or email domain matches domain
+        foreach ($admins as $admin) {
+            $item = is_array($admin) ? $admin : $admin->getArrayCopy();
             $code = strtolower((string) ($item['kode_kampus'] ?? ''));
-            if ($code === $domain || str_contains($code, $domain)) {
+            $adminEmailDomain = strtolower(substr(strrchr((string) ($item['email'] ?? ''), '@') ?: '', 1));
+
+            if ($code === $domain || str_contains($code, $domain) || $adminEmailDomain === $domain) {
+                return $item;
+            }
+        }
+
+        // 2nd priority: check shortKey (e.g. "ITB" matching "itb.ac.id")
+        foreach ($admins as $admin) {
+            $item = is_array($admin) ? $admin : $admin->getArrayCopy();
+            $code = strtolower((string) ($item['kode_kampus'] ?? ''));
+            $shortKey = trim(explode('/', $code)[0]);
+
+            if ($shortKey !== '' && (str_contains($domain, $shortKey) || str_contains($shortKey, $domain))) {
                 return $item;
             }
         }

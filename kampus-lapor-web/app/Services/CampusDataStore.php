@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\Regex;
 use MongoDB\Client;
 use MongoDB\Collection;
 
@@ -23,8 +24,18 @@ class CampusDataStore
 
     public function locations(string $campusKey): array
     {
+        $shortKey = trim(explode('/', $campusKey)[0]);
+        $orConditions = [
+            ['campus_key' => $campusKey],
+        ];
+
+        if ($shortKey !== '') {
+            $regex = new Regex('^' . preg_quote($shortKey) . '(\b|\s|/|$)', 'i');
+            $orConditions[] = ['campus_key' => $regex];
+        }
+
         $items = $this->locations
-            ->find(['campus_key' => $campusKey], ['sort' => ['created_at' => -1]])
+            ->find(['$or' => $orConditions], ['sort' => ['created_at' => -1]])
             ->toArray();
 
         return array_map(fn ($item) => $this->normalize($item), $items);
@@ -42,10 +53,32 @@ class CampusDataStore
         ]);
     }
 
-    public function civitasUsers(string $campusKey): array
+    public function civitasUsers(string $campusKey, ?string $adminUsername = null, ?string $campusName = null): array
     {
+        $shortKey = trim(explode('/', $campusKey)[0]);
+        $orConditions = [
+            ['campus_key' => $campusKey],
+            ['kode_kampus' => $campusKey],
+        ];
+
+        if ($shortKey !== '') {
+            $regex = new Regex('^' . preg_quote($shortKey) . '(\b|\s|/|$)', 'i');
+            $orConditions[] = ['campus_key' => $regex];
+            $orConditions[] = ['kode_kampus' => $regex];
+        }
+
+        $sessionCampus = session('auth_kampus') ?: $campusName;
+        if (!empty($sessionCampus)) {
+            $orConditions[] = ['kampus' => $sessionCampus];
+        }
+
+        $sessionUser = session('auth_username') ?: $adminUsername;
+        if (!empty($sessionUser)) {
+            $orConditions[] = ['admin_username' => $sessionUser];
+        }
+
         $items = $this->users->find(
-            ['role' => 'civitas', 'campus_key' => $campusKey],
+            ['role' => 'civitas', '$or' => $orConditions],
             ['projection' => ['password' => 0], 'sort' => ['created_at' => -1]]
         )->toArray();
 
@@ -88,9 +121,19 @@ class CampusDataStore
             return false;
         }
 
+        $shortKey = trim(explode('/', $campusKey)[0]);
+        $orConditions = [
+            ['campus_key' => $campusKey],
+        ];
+
+        if ($shortKey !== '') {
+            $regex = new Regex('^' . preg_quote($shortKey) . '(\b|\s|/|$)', 'i');
+            $orConditions[] = ['campus_key' => $regex];
+        }
+
         $result = $this->locations->deleteOne([
             '_id' => new ObjectId($id),
-            'campus_key' => $campusKey,
+            '$or' => $orConditions,
         ]);
 
         return $result->getDeletedCount() > 0;
@@ -102,8 +145,30 @@ class CampusDataStore
             return false;
         }
 
+        $shortKey = trim(explode('/', $campusKey)[0]);
+        $orConditions = [
+            ['campus_key' => $campusKey],
+            ['kode_kampus' => $campusKey],
+        ];
+
+        if ($shortKey !== '') {
+            $regex = new Regex('^' . preg_quote($shortKey) . '(\b|\s|/|$)', 'i');
+            $orConditions[] = ['campus_key' => $regex];
+            $orConditions[] = ['kode_kampus' => $regex];
+        }
+
+        $sessionCampus = session('auth_kampus');
+        if (!empty($sessionCampus)) {
+            $orConditions[] = ['kampus' => $sessionCampus];
+        }
+
+        $sessionUser = session('auth_username');
+        if (!empty($sessionUser)) {
+            $orConditions[] = ['admin_username' => $sessionUser];
+        }
+
         $result = $this->users->updateOne(
-            ['_id' => new ObjectId($id), 'role' => 'civitas', 'campus_key' => $campusKey],
+            ['_id' => new ObjectId($id), 'role' => 'civitas', '$or' => $orConditions],
             ['$set' => ['status' => $status, 'updated_at' => now()->toIso8601String()]]
         );
 

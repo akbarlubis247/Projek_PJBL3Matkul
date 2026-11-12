@@ -174,14 +174,30 @@ class AuthController extends Controller
         ]);
 
         $user = $this->database()->selectCollection('users')->findOne([
-            'username' => $data['username'],
+            '$or' => [
+                ['username' => $data['username']],
+                ['identifier' => $data['username']],
+                ['nim' => $data['username']],
+            ],
             'role' => 'civitas',
-            'status' => ['$in' => ['Aktif', 'aktif']],
         ]);
 
         if (! $user || ! Hash::check($data['password'], $user['password'] ?? '')) {
             return response()
                 ->json(['message' => 'Username atau password civitas tidak sesuai.'], 422)
+                ->header('Access-Control-Allow-Origin', '*');
+        }
+
+        $status = strtolower((string) ($user['status'] ?? 'menunggu'));
+        if ($status === 'menunggu') {
+            return response()
+                ->json(['message' => 'Akun menunggu persetujuan admin kampus.'], 403)
+                ->header('Access-Control-Allow-Origin', '*');
+        }
+
+        if ($status === 'banned') {
+            return response()
+                ->json(['message' => 'Akun Anda dinonaktifkan/dibanned oleh admin kampus.'], 403)
                 ->header('Access-Control-Allow-Origin', '*');
         }
 
@@ -211,6 +227,7 @@ class AuthController extends Controller
 
     private function findAdminByCampusDomain(string $domain): ?array
     {
+        $domain = strtolower(trim($domain));
         if ($domain === '') {
             return null;
         }
@@ -218,12 +235,24 @@ class AuthController extends Controller
         $admins = $this->database()->selectCollection('users')->find([
             'role' => 'admin',
             'status' => 'aktif',
-        ]);
+        ])->toArray();
 
         foreach ($admins as $admin) {
-            $item = $admin->getArrayCopy();
+            $item = is_array($admin) ? $admin : $admin->getArrayCopy();
             $campusCode = strtolower((string) ($item['kode_kampus'] ?? ''));
-            if ($campusCode === $domain || str_contains($campusCode, $domain)) {
+            $adminEmailDomain = strtolower(substr(strrchr((string) ($item['email'] ?? ''), '@') ?: '', 1));
+
+            if ($campusCode === $domain || str_contains($campusCode, $domain) || $adminEmailDomain === $domain) {
+                return $item;
+            }
+        }
+
+        foreach ($admins as $admin) {
+            $item = is_array($admin) ? $admin : $admin->getArrayCopy();
+            $campusCode = strtolower((string) ($item['kode_kampus'] ?? ''));
+            $shortKey = trim(explode('/', $campusCode)[0]);
+
+            if ($shortKey !== '' && (str_contains($domain, $shortKey) || str_contains($shortKey, $domain))) {
                 return $item;
             }
         }
