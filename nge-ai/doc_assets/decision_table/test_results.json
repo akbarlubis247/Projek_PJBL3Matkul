@@ -1,0 +1,82 @@
+[
+  {
+    "rule": 1,
+    "titleFilled": true,
+    "descFilled": true,
+    "fileFilled": true,
+    "expected": "success",
+    "actual": "success",
+    "currentUrl": "https://ptb-ipb.freedev.app/artikel.php",
+    "pass": true
+  },
+  {
+    "rule": 2,
+    "titleFilled": true,
+    "descFilled": true,
+    "fileFilled": false,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  },
+  {
+    "rule": 3,
+    "titleFilled": true,
+    "descFilled": false,
+    "fileFilled": true,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  },
+  {
+    "rule": 4,
+    "titleFilled": true,
+    "descFilled": false,
+    "fileFilled": false,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  },
+  {
+    "rule": 5,
+    "titleFilled": false,
+    "descFilled": true,
+    "fileFilled": true,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  },
+  {
+    "rule": 6,
+    "titleFilled": false,
+    "descFilled": true,
+    "fileFilled": false,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  },
+  {
+    "rule": 7,
+    "titleFilled": false,
+    "descFilled": false,
+    "fileFilled": true,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  },
+  {
+    "rule": 8,
+    "titleFilled": false,
+    "descFilled": false,
+    "fileFilled": false,
+    "expected": "error",
+    "actual": "error",
+    "currentUrl": "https://ptb-ipb.freedev.app/upload.php?type=article",
+    "pass": true
+  }
+]

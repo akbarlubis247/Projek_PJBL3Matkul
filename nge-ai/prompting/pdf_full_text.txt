@@ -1,0 +1,537 @@
+﻿=== PDF INFO ===
+Total Pages: 13
+
+========== PAGE 1 ==========
+LATIHAN PRAKTIKUM DECISION TABLE TESTING
+- Kayla Fadh Suroso - J0403241034
+- Salsabila - J0403241059
+Nama - Ega Restiyani NIM - J0403241061
+- Ari Rahman - J0403241143
+- Siti Nayla Alikha Nisrina - J0403241162
+Kamis, 10 September
+Kelompok E Tanggal
+2026
+A. Tujuan Latihan
+Mahasiswa mampu menerjemahkan business rules menjadi conditions dan actions, menyusun complete
+decision table, mengidentifikasi Don't Care (–), melakukan simplification, serta menurunkan effective rules
+menjadi test cases.
+B. Kasus Latihan: Persetujuan Pesanan COD
+Sebuah aplikasi e-commerce menyediakan metode pembayaran Cash on Delivery (COD). Sistem
+menentukan apakah pesanan dapat diproses menggunakan COD berdasarkan tiga kondisi berikut:
+● Alamat pengiriman berada dalam wilayah layanan COD.
+● Nilai pesanan tidak melebihi batas maksimum COD.
+● Pelanggan tidak berstatus diblokir.
+● Jika pelanggan diblokir, pesanan COD ditolak tanpa mempertimbangkan kondisi lainnya.
+● Jika pelanggan tidak diblokir tetapi alamat di luar wilayah COD, pesanan COD ditolak.
+● Jika pelanggan tidak diblokir dan alamat terjangkau tetapi nilai pesanan melebihi batas COD, sistem
+meminta pelanggan memilih metode pembayaran lain.
+● Jika seluruh persyaratan terpenuhi, pesanan COD disetujui.
+C. Langkah 1 . Identifikasi Business Rules
+Tuliskan kembali aturan bisnis dalam bentuk IF THEN yang lebih eksplisit.
+No. Business Rule (IF) Expected Action (THEN)
+THEN pesanan COD ditolak,
+1 IF pelanggan diblokir (C3 = N) tanpa mempertimbangkan
+kondisi alamat dan nilai pesanan
+IF pelanggan tidak diblokir (C3 = Y) AND alamat di luar
+2 THEN pesanan COD ditolak
+wilayah COD (C1 = N)
+IF pelanggan tidak diblokir (C3 = Y) AND alamat berada THEN sistem meminta
+3 dalam wilayah COD (C1 = Y) AND nilai pesanan melebihi pelanggan memilih metode
+batas maksimum (C2 = N) pembayaran lain
+
+========== PAGE 2 ==========
+IF pelanggan tidak diblokir (C3 = Y) AND alamat berada
+4 dalam wilayah COD (C1 = Y) AND nilai pesanan tidak THEN pesanan COD disetujui
+melebihi batas maksimum (C2 = N)
+D. Langkah 2 . Identifikasi Conditions dan Actions
+ID Conditions ID Actions
+Alamat pengiriman
+C1 berada dalam wilayah A1 Pesanan COD disetujui
+layanan COD
+Nilai pesanan tidak
+C2 melebihi batas A2 Pesanan COD ditolak
+maksimum COD
+Pelanggan diminta
+Pelanggan tidak
+C3 A3 memilih metode
+berstatus diblokir
+pembayaran lain
+Gunakan nilai Y = kondisi terpenuhi, N = kondisi tidak terpenuhi.
+E. Langkah 3 . Complete Decision Table
+Karena terdapat 3 conditions Boolean, buat seluruh 2³ = 8 kombinasi terlebih dahulu.
+R1 R2 R3 R4 R5 R6 R7 R8
+C1. Alamat berada
+dalam wilayah Y Y Y Y N N N N
+layanan COD
+C2. Nilai pesanan
+tidak melebihi batas Y Y N N Y Y N N
+maksimum COD
+C3. Pelanggan tidak
+Y N Y N Y N Y N
+berstatus diblokir
+A1. Pesanan COD
+X
+disetujui
+A2. Pesanan COD
+X X X X X X
+ditolak
+A3. Pelanggan
+diminta memilih
+X
+metode pembayaran
+lain
+Petunjuk: isi baris condition dengan Y/N. Beri tanda X pada action yang diharapkan untuk setiap rule.
+
+========== PAGE 3 ==========
+F. Langkah 4. Analisis Rule dan Don't Care
+Periksa apakah ada condition yang tidak lagi memengaruhi keputusan pada rule tertentu. Gunakan simbol
+“-“ untuk Don't Care.
+Penjelasan penyederhanaan:
+Penyederhanaan decision table dilakukan dengan membandingkan beberapa rule yang memiliki action yang
+sama. Jika terdapat condition yang berbeda tetapi condition tersebut tidak memengaruhi keputusan akhir
+berdasarkan business rule, maka condition tersebut dapat diubah menjadi Don't Care (-). Dengan demikian,
+beberapa kombinasi rule yang memiliki hasil sama dapat digabung menjadi satu effective rule tanpa
+menghilangkan coverage.
+Pada kasus ini, terdapat dua penyederhanaan utama. Pertama, R2 dan R4 dapat digabung karena keduanya
+menghasilkan A2 (pesanan COD ditolak) dan sama-sama memiliki C1=Y dan C3=N, yang berarti
+pelanggan berada di dalam wilayah layanan COD dan berstatus diblokir. Berdasarkan business rule,
+pelanggan yang berada di dalam wilayah layanan COD tetapi berstatus diblokir langsung ditolak tanpa
+mempertimbangkan nilai pesanan, sehingga C2 dapat menjadi Don't Care (-). Kedua, R5, R6, R7, dan R8
+dapat digabung karena semuanya memiliki C1=N, yaitu alamat berada di luar wilayah layanan COD, dan
+seluruhnya menghasilkan A2. Dalam kondisi tersebut, COD tetap ditolak tanpa mempertimbangkan nilai
+pesanan maupun status pelanggan. Oleh karena itu, C2 dan C3 dapat menjadi Don't Care (-). Sementara itu,
+R1 dan R3 tidak dapat digabung karena masing-masing menghasilkan action yang berbeda dan memiliki
+kondisi yang menentukan keputusan secara spesifik. R1 menghasilkan COD disetujui, sedangkan R3
+meminta pelanggan memilih metode pembayaran lain.
+Rule yang Condition yang Dapat digabung?
+Action sama?
+dibandingkan berbeda Alasan
+Dapat digabung, karena
+pada kedua rule
+pelanggan berstatus
+diblokir (C3=N),
+sehingga pesanan COD
+R2, R4 C2 Ya, A2
+selalu ditolak tanpa
+mempertimbangkan
+nilai pesanan. Oleh
+karena itu, C2 menjadi
+Don't Care (-).
+Dapat digabung, karena
+pada keempat rule
+alamat berada di luar
+wilayah layanan COD
+(C1=N), sehingga
+R5, R6, R7, R8 C2, C3 Ya, A2
+pesanan COD tetap
+ditolak tanpa
+mempertimbangkan
+nilai pesanan maupun
+status pelanggan. Oleh
+
+========== PAGE 4 ==========
+karena itu, C2 dan C3
+menjadi Don't Care (-).
+Tidak dapat digabung,
+karena R1 menghasilkan
+A1 (COD disetujui),
+sedangkan rule lainnya
+R1 dengan R lainnya - Tidak tidak memiliki kondisi
+yang dapat digabung
+dengan R1 tanpa
+mengubah hasil yang
+seharusnya.
+Tidak dapat digabung,
+karena R3 menghasilkan
+A3 (memilih metode
+pembayaran lain),
+R3 dengan R lainnya - Tidak sehingga tidak memiliki
+rule lain dengan action
+yang sama dan kondisi
+yang dapat
+disederhanakan.
+G. Langkah 5 . Simplified Decision Table
+Gabungkan rules yang ekuivalen tanpa mengurangi coverage. Jumlah effective rules tidak harus sama
+dengan template baris di bawah.
+Effective Rule C1 C2 C3 Expected Action
+ER1 Y Y Y A1. Pesanan COD disetujui
+ER2 Y N Y A3. Minta pilih metode pembayaran lain
+ER3 Y - N A2. Pesanan COD ditolak.
+ER4 N - - A2. Pesanan COD ditolak
+Catatan: simplification tidak boleh mengubah business rule atau menghilangkan kombinasi yang
+seharusnya tercakup.
+H. Langkah 6 . Derive Test Cases
+Turunkan setiap effective rule yang feasible menjadi minimal satu test case dengan data uji konkret.
+Test Data / Expected
+ID Pre-condition Actual Output Status
+Steps Output
+Alamat:
+Jakarta(Dalam
+wilayah COD),
+Pelanggan
+Total pesanan: Pesanan COD Sesuai hasil
+TC01 tidak berstatus PASS
+Rp500.000( ⩽ disetujui eksekusi
+diblokir
+Batas max
+COD);
+Lanjutkan
+
+========== PAGE 5 ==========
+checkout
+menggunakan
+COD
+Alamat:
+Jakarta(Dalam
+wilayah COD),
+Pelanggan
+Total pesanan:
+diminta
+Pelanggan Rp
+memilih Sesuai hasil
+TC02 tidak berstatus 1.500.000(>Bat PASS
+metode eksekusi
+diblokir as max COD);
+pembayaran
+Lanjutkan
+lain
+checkout
+menggunakan
+COD
+Alamat:
+Bandung (Luar
+wilayah COD),
+Total pesanan:
+Pelanggan Rp 500.000( ⩽
+Pesanan COD Sesuai hasil
+TC03 tidak berstatus Batas max PASS
+ditolak eksekusi
+diblokir COD);
+Lanjutkan
+checkout
+menggunakan
+COD
+Alamat: Jakarta
+(Dalam
+wilayah COD),
+Total pesanan:
+Pelanggan
+Rp 500.000( ⩽ Pesanan COD Sesuai hasil
+TC04 berstatus PASS
+Batas max ditolak eksekusi
+diblokir
+COD);Lanjutka
+n checkout
+Menggunakan
+COD
+I. Pertanyaan Analisis
+1. Mengapa complete decision table pada kasus ini memiliki maksimum 8 rules?
+Jawaban:
+Complete decision table pada kasus ini memiliki maksimum 8 rules karena terdapat 3 conditions Boolean,
+yaitu C1, C2, dan C3. Setiap condition memiliki dua kemungkinan nilai, yaitu Y (terpenuhi) dan N (tidak
+terpenuhi). Oleh karena itu, jumlah seluruh kemungkinan kombinasi dapat dihitung dengan rumus 2^n,
+dengan n adalah jumlah conditions. Karena terdapat 3 conditions, maka 2^3 = 8 kombinasi. Setiap
+kombinasi tersebut direpresentasikan sebagai satu rule pada complete decision table.
+
+========== PAGE 6 ==========
+2. Condition mana yang dapat menjadi Don't Care? Jelaskan berdasarkan business rule.
+Jawaban:
+Condition yang dapat menjadi Don't Care (-) adalah C2 dan C3 ketika C1 = N, karena jika pelanggan
+berada di luar wilayah layanan COD, pesanan COD langsung ditolak tanpa mempertimbangkan nilai
+pesanan maupun statuk pemblokiran. Selain itu, C2 dapat menjadi Don't Care ketika C3 = N dan C1 = Y,
+karena jika alamat berada di dalam wilayah COD tetapi pelanggan diblokir, pesanan tetap ditolak berapa
+pun nilai pesanannya. Dengan demikian, condition yang tidak memengaruhi keputusan pada rule tersebut
+dapat diganti dengan simbol “-”.
+3. Berapa effective rules setelah simplification? Mengapa jumlahnya dapat lebih sedikit dari 8?
+Jawaban:
+Setelah dilakukan simplification, terdapat 4 effective rules. Jumlah tersebut lebih sedikit dari 8 karena
+beberapa kombinasi pada complete decision table menghasilkan action yang sama dan memiliki kondisi
+tertentu yang tidak memengaruhi keputusan. R2 dan R4 dapat digabung karena pelanggan yang diblokir
+selalu ditolak tanpa mempertimbangkan nilai pesanan. R5, R6, R7, dan R8 juga dapat digabung karena
+alamat yang berada di luar wilayah COD selalu menyebabkan penolakan tanpa mempertimbangkan nilai
+pesanan maupun status pelanggan. Dengan menggunakan Don't Care, beberapa kombinasi dapat
+direpresentasikan oleh satu effective rule.
+4. Apakah simplification mengurangi test coverage? Jelaskan.
+Jawaban:
+Tidak, selama simplification dilakukan dengan benar. Simplification hanya menggabungkan beberapa rule
+yang memiliki hasil yang sama dan mengubah condition yang tidak memengaruhi keputusan menjadi Don't
+Care. Seluruh kombinasi yang sebelumnya tercakup oleh complete decision table tetap direpresentasikan
+oleh effective rules. Pada kasus ini, 8 kombinasi awal disederhanakan menjadi 4 effective rules, kemudian
+masing-masing effective rule diturunkan menjadi minimal satu test case. Dengan demikian, coverage
+terhadap seluruh business rule tetap dipertahankan meskipun jumlah test case menjadi lebih sedikit.
+5. Jika salah satu condition berupa nilai numerik (misalnya batas maksimum COD), bagaimana BVA dapat
+dikombinasikan dengan Decision Table untuk memilih test data?
+Jawaban:
+BVA dapat dikombinasikan dengan Decision Table dengan terlebih dahulu menggunakan Decision Table
+untuk menentukan kombinasi kondisi yang harus diuji, kemudian menggunakan BVA untuk memilih nilai
+konkret di sekitar boundary pada condition numerik. Misalnya batas maksimum COD adalah Rp1.000.000.
+Untuk condition C2, nilai yang dapat digunakan adalah nilai di bawah batas, tepat pada batas, dan di atas
+batas, seperti Rp999.999, Rp1.000.000, dan Rp1.000.001. Nilai tersebut kemudian digunakan pada rule
+yang dipengaruhi oleh C2, khususnya kondisi pelanggan tidak diblokir dan alamat berada dalam wilayah
+COD.
+
+========== PAGE 7 ==========
+J. Penerapan pada Proyek Kelompok
+Pilih satu fitur utama (bukan login) pada proyek kelompok yang memiliki minimal dua business conditions.
+Ulangi langkah C - H menggunakan requirement proyek masing-masing. Lampirkan: business rules,
+conditions/actions, complete decision table, simplified decision table (jika memungkinkan), test cases, serta
+hasil eksekusi PASS/FAIL.
+
+========== PAGE 8 ==========
+LATIHAN PRAKTIKUM DECISION TABLE TESTING
+- Kayla Fadh Suroso - J0403241034
+- Salsabila - J0403241059
+Nama - Ega Restiyani NIM - J0403241061
+- Ari Rahman - J0403241143
+- Siti Nayla Alikha Nisrina - J0403241162
+Kamis, 10 September
+Kelompok E Tanggal
+2026
+A. Tujuan Latihan
+Mahasiswa mampu menerjemahkan business rules menjadi conditions dan actions, menyusun complete
+decision table, mengidentifikasi Don't Care (–), melakukan simplification, serta menurunkan effective rules
+menjadi test cases.
+B. Kasus Latihan: Web PTB
+C. Langkah 1 . Identifikasi Business Rules
+Tuliskan kembali aturan bisnis dalam bentuk IF THEN yang lebih eksplisit.
+No. Business Rule (IF) Expected Action (THEN)
+THEN pesanan COD ditolak,
+1 IF pelanggan diblokir (C3 = N) tanpa mempertimbangkan
+kondisi alamat dan nilai pesanan
+IF pelanggan tidak diblokir (C3 = Y) AND alamat di luar
+2 THEN pesanan COD ditolak
+wilayah COD (C1 = N)
+IF pelanggan tidak diblokir (C3 = Y) AND alamat berada THEN sistem meminta
+3 dalam wilayah COD (C1 = Y) AND nilai pesanan melebihi pelanggan memilih metode
+batas maksimum (C2 = N) pembayaran lain
+IF pelanggan tidak diblokir (C3 = Y) AND alamat berada
+4 dalam wilayah COD (C1 = Y) AND nilai pesanan tidak THEN pesanan COD disetujui
+melebihi batas maksimum (C2 = N)
+D. Langkah 2 . Identifikasi Conditions dan Actions
+ID Conditions ID Actions
+Alamat pengiriman
+C1 berada dalam wilayah A1 Pesanan COD disetujui
+layanan COD
+Nilai pesanan tidak
+C2 melebihi batas A2 Pesanan COD ditolak
+maksimum COD
+
+========== PAGE 9 ==========
+Pelanggan diminta
+Pelanggan tidak
+C3 A3 memilih metode
+berstatus diblokir
+pembayaran lain
+Gunakan nilai Y = kondisi terpenuhi, N = kondisi tidak terpenuhi.
+E. Langkah 3 . Complete Decision Table
+Karena terdapat 3 conditions Boolean, buat seluruh 2³ = 8 kombinasi terlebih dahulu.
+R1 R2 R3 R4 R5 R6 R7 R8
+C1. Alamat berada
+dalam wilayah Y Y Y Y N N N N
+layanan COD
+C2. Nilai pesanan
+tidak melebihi batas Y Y N N Y Y N N
+maksimum COD
+C3. Pelanggan tidak
+Y N Y N Y N Y N
+berstatus diblokir
+A1. Pesanan COD
+X
+disetujui
+A2. Pesanan COD
+X X X X X X
+ditolak
+A3. Pelanggan
+diminta memilih
+X
+metode pembayaran
+lain
+Petunjuk: isi baris condition dengan Y/N. Beri tanda X pada action yang diharapkan untuk setiap rule.
+F. Langkah 4. Analisis Rule dan Don't Care
+Periksa apakah ada condition yang tidak lagi memengaruhi keputusan pada rule tertentu. Gunakan simbol
+“-“ untuk Don't Care.
+Penjelasan penyederhanaan:
+Penyederhanaan decision table dilakukan dengan membandingkan beberapa rule yang memiliki action yang
+sama. Jika terdapat condition yang berbeda tetapi condition tersebut tidak memengaruhi keputusan akhir
+berdasarkan business rule, maka condition tersebut dapat diubah menjadi Don't Care (-). Dengan demikian,
+beberapa kombinasi rule yang memiliki hasil sama dapat digabung menjadi satu effective rule tanpa
+menghilangkan coverage.
+Pada kasus ini, terdapat dua penyederhanaan utama. Pertama, R2 dan R4 dapat digabung karena keduanya
+menghasilkan A2 (pesanan COD ditolak) dan sama-sama memiliki C1=Y dan C3=N, yang berarti
+pelanggan berada di dalam wilayah layanan COD dan berstatus diblokir. Berdasarkan business rule,
+pelanggan yang berada di dalam wilayah layanan COD tetapi berstatus diblokir langsung ditolak tanpa
+
+========== PAGE 10 ==========
+mempertimbangkan nilai pesanan, sehingga C2 dapat menjadi Don't Care (-). Kedua, R5, R6, R7, dan R8
+dapat digabung karena semuanya memiliki C1=N, yaitu alamat berada di luar wilayah layanan COD, dan
+seluruhnya menghasilkan A2. Dalam kondisi tersebut, COD tetap ditolak tanpa mempertimbangkan nilai
+pesanan maupun status pelanggan. Oleh karena itu, C2 dan C3 dapat menjadi Don't Care (-). Sementara itu,
+R1 dan R3 tidak dapat digabung karena masing-masing menghasilkan action yang berbeda dan memiliki
+kondisi yang menentukan keputusan secara spesifik. R1 menghasilkan COD disetujui, sedangkan R3
+meminta pelanggan memilih metode pembayaran lain.
+Rule yang Condition yang Dapat digabung?
+Action sama?
+dibandingkan berbeda Alasan
+Dapat digabung, karena
+pada kedua rule
+pelanggan berstatus
+diblokir (C3=N),
+sehingga pesanan COD
+R2, R4 C2 Ya, A2
+selalu ditolak tanpa
+mempertimbangkan
+nilai pesanan. Oleh
+karena itu, C2 menjadi
+Don't Care (-).
+Dapat digabung, karena
+pada keempat rule
+alamat berada di luar
+wilayah layanan COD
+(C1=N), sehingga
+pesanan COD tetap
+R5, R6, R7, R8 C2, C3 Ya, A2
+ditolak tanpa
+mempertimbangkan
+nilai pesanan maupun
+status pelanggan. Oleh
+karena itu, C2 dan C3
+menjadi Don't Care (-).
+Tidak dapat digabung,
+karena R1 menghasilkan
+A1 (COD disetujui),
+sedangkan rule lainnya
+R1 dengan R lainnya - Tidak tidak memiliki kondisi
+yang dapat digabung
+dengan R1 tanpa
+mengubah hasil yang
+seharusnya.
+Tidak dapat digabung,
+karena R3 menghasilkan
+A3 (memilih metode
+R3 dengan R lainnya - Tidak pembayaran lain),
+sehingga tidak memiliki
+rule lain dengan action
+yang sama dan kondisi
+
+========== PAGE 11 ==========
+yang dapat
+disederhanakan.
+G. Langkah 5 . Simplified Decision Table
+Gabungkan rules yang ekuivalen tanpa mengurangi coverage. Jumlah effective rules tidak harus sama
+dengan template baris di bawah.
+Effective Rule C1 C2 C3 Expected Action
+ER1 Y Y Y A1. Pesanan COD disetujui
+ER2 Y N Y A3. Minta pilih metode pembayaran lain
+ER3 Y - N A2. Pesanan COD ditolak.
+ER4 N - - A2. Pesanan COD ditolak
+Catatan: simplification tidak boleh mengubah business rule atau menghilangkan kombinasi yang
+seharusnya tercakup.
+H. Langkah 6 . Derive Test Cases
+Turunkan setiap effective rule yang feasible menjadi minimal satu test case dengan data uji konkret.
+Test Data / Expected
+ID Pre-condition Actual Output Status
+Steps Output
+Alamat:
+Jakarta(Dalam
+wilayah COD),
+Total pesanan:
+Pelanggan Rp500.000( ⩽
+Pesanan COD Sesuai hasil
+TC01 tidak berstatus Batas max PASS
+disetujui eksekusi
+diblokir COD);
+Lanjutkan
+checkout
+menggunakan
+COD
+Alamat:
+Jakarta(Dalam
+wilayah COD),
+Pelanggan
+Total pesanan:
+diminta
+Pelanggan Rp
+memilih Sesuai hasil
+TC02 tidak berstatus 1.500.000(>Bat PASS
+metode eksekusi
+diblokir as max COD);
+pembayaran
+Lanjutkan
+lain
+checkout
+menggunakan
+COD
+Alamat:
+Pelanggan
+Bandung (Luar Pesanan COD Sesuai hasil
+TC03 tidak berstatus PASS
+wilayah COD), ditolak eksekusi
+diblokir
+Total pesanan:
+
+========== PAGE 12 ==========
+Rp 500.000( ⩽
+Batas max
+COD);
+Lanjutkan
+checkout
+menggunakan
+COD
+Alamat: Jakarta
+(Dalam
+wilayah COD),
+Total pesanan:
+Pelanggan
+Rp 500.000( ⩽ Pesanan COD Sesuai hasil
+TC04 berstatus PASS
+Batas max ditolak eksekusi
+diblokir
+COD);Lanjutka
+n checkout
+Menggunakan
+COD
+I. Pertanyaan Analisis
+1. Mengapa complete decision table pada kasus ini memiliki maksimum 8 rules?
+Jawaban:
+Complete decision table pada kasus ini memiliki maksimum 8 rules karena terdapat 3 conditions Boolean,
+yaitu C1, C2, dan C3. Setiap condition memiliki dua kemungkinan nilai, yaitu Y (terpenuhi) dan N (tidak
+terpenuhi). Oleh karena itu, jumlah seluruh kemungkinan kombinasi dapat dihitung dengan rumus 2^n,
+dengan n adalah jumlah conditions. Karena terdapat 3 conditions, maka 2^3 = 8 kombinasi. Setiap
+kombinasi tersebut direpresentasikan sebagai satu rule pada complete decision table.
+2. Condition mana yang dapat menjadi Don't Care? Jelaskan berdasarkan business rule.
+Jawaban:
+Condition yang dapat menjadi Don't Care (-) adalah C2 dan C3 ketika C1 = N, karena jika pelanggan
+berada di luar wilayah layanan COD, pesanan COD langsung ditolak tanpa mempertimbangkan nilai
+pesanan maupun statuk pemblokiran. Selain itu, C2 dapat menjadi Don't Care ketika C3 = N dan C1 = Y,
+karena jika alamat berada di dalam wilayah COD tetapi pelanggan diblokir, pesanan tetap ditolak berapa
+pun nilai pesanannya. Dengan demikian, condition yang tidak memengaruhi keputusan pada rule tersebut
+dapat diganti dengan simbol “-”.
+3. Berapa effective rules setelah simplification? Mengapa jumlahnya dapat lebih sedikit dari 8?
+Jawaban:
+Setelah dilakukan simplification, terdapat 4 effective rules. Jumlah tersebut lebih sedikit dari 8 karena
+beberapa kombinasi pada complete decision table menghasilkan action yang sama dan memiliki kondisi
+tertentu yang tidak memengaruhi keputusan. R2 dan R4 dapat digabung karena pelanggan yang diblokir
+selalu ditolak tanpa mempertimbangkan nilai pesanan. R5, R6, R7, dan R8 juga dapat digabung karena
+
+========== PAGE 13 ==========
+alamat yang berada di luar wilayah COD selalu menyebabkan penolakan tanpa mempertimbangkan nilai
+pesanan maupun status pelanggan. Dengan menggunakan Don't Care, beberapa kombinasi dapat
+direpresentasikan oleh satu effective rule.
+4. Apakah simplification mengurangi test coverage? Jelaskan.
+Jawaban:
+Tidak, selama simplification dilakukan dengan benar. Simplification hanya menggabungkan beberapa rule
+yang memiliki hasil yang sama dan mengubah condition yang tidak memengaruhi keputusan menjadi Don't
+Care. Seluruh kombinasi yang sebelumnya tercakup oleh complete decision table tetap direpresentasikan
+oleh effective rules. Pada kasus ini, 8 kombinasi awal disederhanakan menjadi 4 effective rules, kemudian
+masing-masing effective rule diturunkan menjadi minimal satu test case. Dengan demikian, coverage
+terhadap seluruh business rule tetap dipertahankan meskipun jumlah test case menjadi lebih sedikit.
+5. Jika salah satu condition berupa nilai numerik (misalnya batas maksimum COD), bagaimana BVA dapat
+dikombinasikan dengan Decision Table untuk memilih test data?
+Jawaban:
+BVA dapat dikombinasikan dengan Decision Table dengan terlebih dahulu menggunakan Decision Table
+untuk menentukan kombinasi kondisi yang harus diuji, kemudian menggunakan BVA untuk memilih nilai
+konkret di sekitar boundary pada condition numerik. Misalnya batas maksimum COD adalah Rp1.000.000.
+Untuk condition C2, nilai yang dapat digunakan adalah nilai di bawah batas, tepat pada batas, dan di atas
+batas, seperti Rp999.999, Rp1.000.000, dan Rp1.000.001. Nilai tersebut kemudian digunakan pada rule
+yang dipengaruhi oleh C2, khususnya kondisi pelanggan tidak diblokir dan alamat berada dalam wilayah
+COD.
